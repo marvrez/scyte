@@ -2,7 +2,7 @@ OPENCV ?= 0
 OPENMP ?= 0
 DEBUG  ?= 0
 
-OBJ= main.o
+OBJ= main.o blas.o utils.o
 EXECOBJA= 
 
 VPATH=./src/:./examples

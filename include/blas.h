@@ -13,14 +13,14 @@ void axpby_cpu(int N, float alpha, const float* X, float beta, float* Y);
 void copy_cpu(int N, const float* X, float* Y);
 void set_cpu(int N, float alpha, float* y);
 
-void add_cpu(int n, const float* a, const float* b, float* y);
-void sub_cpu(int n, const float* a, const float* b, float* y);
-void mul_cpu(int n, const float* a, const float* b, float* y);
-void div_cpu(int n, const float* a, const float* b, float* y);
+void add_cpu(int n, const float* x, const float* y, float* z);
+void sub_cpu(int n, const float* x, const float* y, float* z);
+void mul_cpu(int n, const float* x, const float* y, float* z);
+void div_cpu(int n, const float* x, const float* y, float* z);
 
 void pow_cpu(int n, float alpha, const float* x, float* y);
 void scale_cpu(int n, float alpha, const float* x, float* y);
-void bias_cpu(int n, float alpha, const float* x,  float* y);
+void bias_cpu(int n, float alpha, const float* x, float* y);
 void exp_cpu(int n, const float* x, float* y);
 void abs_cpu(int n, const float* x, float* y);
 
