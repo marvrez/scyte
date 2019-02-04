@@ -5,7 +5,7 @@ void gemm_cpu(bool trans_a, bool trans_b, int M, int N, int K,
         float alpha, const float* A, const float* B, float beta, float* C);
 
 void gemv_cpu(bool trans_a, int M, int N, float alpha, 
-        const float* A, const float* x, const float beta, float* y);
+        const float* A, const float* x, float beta, float* y);
 
 void axpy_cpu(int N, float alpha, const float* X, float* Y);
 void axpby_cpu(int N, float alpha, const float* X, float beta, float* Y);
