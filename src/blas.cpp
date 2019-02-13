@@ -11,7 +11,7 @@ static inline void gemm_nn(int M, int N, int K, float alpha,
     #pragma omp parallel for
     for(int i = 0; i < M; ++i) {
         for(int k = 0; k < K; ++k) {
-            register float a_part = alpha*A[i*lda+k];
+            float a_part = alpha*A[i*lda+k];
             for(int j = 0; j < N; ++j) {
                 C[i*ldc+j] += a_part*B[k*ldb+j];
             }
@@ -27,7 +27,7 @@ static inline void gemm_nt(int M, int N, int K, float alpha,
     #pragma omp parallel for
     for(int i = 0; i < M; ++i) {
         for(int j = 0; j < N; ++j) {
-            register float sum = 0;
+            float sum = 0;
             for(int k = 0; k < K; ++k) {
                 sum += alpha*A[i*lda+k]*B[j*ldb + k];
             }
@@ -44,7 +44,7 @@ static inline void gemm_tn(int M, int N, int K, float alpha,
     #pragma omp parallel for
     for(int i = 0; i < M; ++i) {
         for(int k = 0; k < K; ++k) {
-            register float a_part = alpha*A[k*lda+i];
+            float a_part = alpha*A[k*lda+i];
             for(int j = 0; j < N; ++j) {
                 C[i*ldc+j] += a_part*B[k*ldb+j];
             }
@@ -60,7 +60,7 @@ static inline void gemm_tt(int M, int N, int K, float alpha,
     #pragma omp parallel for
     for(int i = 0; i < M; ++i) {
         for(int j = 0; j < N; ++j) {
-            register float sum = 0;
+            float sum = 0;
             for(int k = 0; k < K; ++k) {
                 sum += alpha*A[i+k*lda]*B[k+j*ldb];
             }
@@ -77,10 +77,9 @@ void gemm_cpu(bool trans_a, bool trans_b, int M, int N, int K,
     int ldb = trans_b ? N : K;
     int ldc = N;
 
-    for(int i = 0; i < M; ++i) {
-        for(int j = 0; j < N; ++j) {
-            C[i*ldc + j] *= beta;
-        }
+    #pragma omp parallel for
+    for(int i = 0; i < M*N; ++i) {
+        C[i] *= beta;
     }
 
     if(!trans_a && !trans_b) gemm_nn(M, N, K, alpha, A, lda, B, ldb, C, ldc);
@@ -94,7 +93,7 @@ static inline void gemv_n(int M, int N, float alpha,
 {
     #pragma omp parallel for
     for(int i = 0; i < M; ++i) {
-        register float sum = 0;
+        float sum = 0;
         for(int j = 0; j < N; ++j) {
             sum += alpha*A[j+i*lda]*x[j];
         }
@@ -117,6 +116,7 @@ void gemv_cpu(bool trans_a, int M, int N, float alpha,
         const float* A, const float* x, float beta, float* y)
 {
     int lda = trans_a ? N : M;
+    #pragma omp parallel for
     for(int i = 0; i < lda; ++i) {
         y[i] *= beta;
     }
