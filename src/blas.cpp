@@ -3,6 +3,44 @@
 #include <cmath>
 #include <cstring>
 
+#ifdef OPENBLAS
+extern "C" {
+#include <cblas.h>
+}
+
+void gemm_cpu(bool trans_a, bool trans_b, int M, int N, int K,
+        float alpha, const float* A, const float* B, float beta, float* C)
+{
+    int lda = trans_a ? K : M;
+    int ldb = trans_b ? N : K;
+    int ldc = N;
+    cblas_sgemm(CblasRowMajor, trans_a ? CblasTrans : CblasTrans, trans_b ? CblasTrans : CblasNoTrans, 
+            M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
+}
+
+void gemv_cpu(bool trans_a, int M, int N, float alpha, 
+        const float* A, const float* x, float beta, float* y)
+{
+    cblas_sgemv(CblasRowMajor, trans_a ? CblasTrans : CblasNoTrans, M, N, alpha, A, N, x, 1, beta, y, 1);
+}
+
+void axpy_cpu(int N, float alpha, const float* X, float* Y)
+{
+    cblas_saxpy(N, alpha, X, 1, Y, 1);
+}
+
+void axpby_cpu(int N, float alpha, const float* X, float beta, float* Y)
+{
+    cblas_saxpby(N, alpha, X, 1, beta, Y, 1);
+}
+
+void scale_cpu(int n, float alpha, const float* x, float* y)
+{
+    cblas_scopy(n, x, 1, y, 1);
+    cblas_sscal(n, alpha, y, 1);
+}
+
+#else
 static inline void gemm_nn(int M, int N, int K, float alpha,
         const float* A, int lda,
         const float* B, int ldb,
@@ -139,22 +177,13 @@ void axpby_cpu(int N, float alpha, const float* X, float beta, float* Y)
     }
 }
 
-void copy_cpu(int N, const float* X, float* Y)
+void scale_cpu(int n, float alpha, const float* x, float* y)
 {
-    if (X == Y) return;
-    memcpy(Y, X, sizeof(float)*N);
-}
-
-void set_cpu(int N, float alpha, float* y)
-{
-    if(alpha == 0.f) {
-        memset(y, 0.f, sizeof(float)*N);
-        return;
-    }
-    for (int i = 0; i < N; ++i) {
-        y[i] = alpha;
+    for(int i = 0; i < n; ++i) {
+        y[i] = alpha*x[i];
     }
 }
+#endif
 
 void add_cpu(int n, const float* x, const float* y, float* z)
 {
@@ -191,18 +220,17 @@ void pow_cpu(int n, float alpha, const float* x, float* y)
     }
 }
 
-void scale_cpu(int n, float alpha, const float* x, float* y)
-{
-    for(int i = 0; i < n; ++i) {
-        y[i] = alpha*x[i];
-    }
-}
-
 void bias_cpu(int n, float alpha, const float* x, float* y)
 {
     for (int i = 0; i < n; ++i) {
         y[i] = alpha + x[i];
     }
+}
+
+void copy_cpu(int N, const float* X, float* Y)
+{
+    if (X == Y) return;
+    memcpy(Y, X, sizeof(float)*N);
 }
 
 void exp_cpu(int n, const float* x, float* y)
@@ -216,5 +244,16 @@ void abs_cpu(int n, const float* x, float* y)
 {
     for (int i = 0; i < n; ++i) {
         y[i] = fabsf(x[i]);
+    }
+}
+
+void set_cpu(int N, float alpha, float* y)
+{
+    if(alpha == 0.f) {
+        memset(y, 0.f, sizeof(float)*N);
+        return;
+    }
+    for (int i = 0; i < N; ++i) {
+        y[i] = alpha;
     }
 }
