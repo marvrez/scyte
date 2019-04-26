@@ -3,11 +3,11 @@ OPENCV ?= 0
 OPENMP ?= 0
 DEBUG  ?= 0
 
-OBJ= main.o blas.o utils.o mat.o layer.o net.o
+OBJ= main.o blas.o utils.o tensor.o
 EXECOBJA= 
 
 VPATH=./src/:./examples
-EXEC=latte
+EXEC=scyte
 OBJDIR=./obj/
 
 CPP=g++

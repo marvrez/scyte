@@ -6,7 +6,7 @@
 *.lo
 *.o
 *.obj
-latte
+scyte
 
 # Precompiled Headers
 *.gch
