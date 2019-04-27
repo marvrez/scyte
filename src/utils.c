@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+#define M_TWO_PI 6.2831853071795864769252866f
+
 double time_now() 
 {
     struct timeval time;
@@ -12,7 +14,7 @@ double time_now()
 }
 
 // From https://en.wikipedia.org/wiki/Box-Muller_transform
-float rand_normal()
+float randn()
 {
     static int have_spare = 0;
     static double rand1, rand2;
@@ -27,12 +29,17 @@ float rand_normal()
     rand1 = rand() / ((double) RAND_MAX);
     if(rand1 < 1e-100) rand1 = 1e-100;
     rand1 = -2 * log(rand1);
-    rand2 = (rand() / ((double) RAND_MAX)) * TWO_PI;
+    rand2 = (rand() / ((double) RAND_MAX)) * M_TWO_PI;
 
     return sqrt(rand1) * cos(rand2);
 }
 
-float rand_uniform(float min, float max)
+float random_normal(float mu, float sigma)
+{
+	return mu + sigma*randn();
+}
+
+float random_uniform(float min, float max)
 {
     if(max < min) {
         float swap = min;
