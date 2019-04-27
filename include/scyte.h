@@ -11,22 +11,22 @@ typedef enum {
 } scyte_node_type;
 
 typedef struct scyte_node {
-	scyte_node_type type;
-    void	(*forward)	(struct scyte_node*);
-    void	(*backward)	(struct scyte_node*);
+    scyte_node_type type;
+    void    (*forward)	(struct scyte_node*);
+    void    (*backward)	(struct scyte_node*);
 
-	unsigned 	num_dims;
-	int			shape[SCYTE_MAX_DIMS];
+    unsigned    num_dims;
+    int         shape[SCYTE_MAX_DIMS];
 
-	float*		in;     // input values to the node
-	float*		out;    // output values produced by the node
-	float*		delta;  // deltas provided by the output/top nodes
+    float*      in;     // input values to the node
+    float*      out;    // output values produced by the node
+    float*      delta;  // deltas provided by the output/top nodes
 
-	float*		tmp;    // values produced in forward pass that are needed for the backward pass
-	float*		params; // extra parameters needed by the node, e.g. stride and padding for convolution
+    float*      tmp;    // values produced in forward pass that are needed for the backward pass
+    float*      params; // extra parameters needed by the node, e.g. stride and padding for convolution
 
-	int 				num_children;
-	struct scyte_node** children;
+    int         num_children;
+    struct scyte_node** children;
 } scyte_node;
 
 scyte_node** scyte_make_graph(int* num_nodes, int num_roots, scyte_node** roots);
