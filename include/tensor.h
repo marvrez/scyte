@@ -7,7 +7,7 @@ typedef struct {
     float* data;    // array data, of size prod_i(d[i]) (1 if n_d==0)
 } tensor;
 
-inline int tensor_length(tensor t) 
+static inline int tensor_length(tensor t)
 {
     int n = 1;
     for(int i = 0; i < t.n_d; ++i) {
