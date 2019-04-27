@@ -1,7 +1,7 @@
 #include "blas.h"
 #include "tensor.h"
 #include "utils.h"
-#include <cstdio>
+#include <stdio.h>
 #include <math.h>
 
 int main(int argc, char** argv)

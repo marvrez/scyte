@@ -1,14 +1,14 @@
 #include "blas.h"
 
-#include <cmath>
-#include <cstring>
+#include <math.h>
+#include <string.h>
 
 #ifdef OPENBLAS
 extern "C" {
 #include <cblas.h>
 }
 
-void gemm_cpu(bool trans_a, bool trans_b, int M, int N, int K,
+void gemm_cpu(int trans_a, int trans_b, int M, int N, int K,
         float alpha, const float* A, const float* B, float beta, float* C)
 {
     int lda = trans_a ? K : M;
@@ -18,7 +18,7 @@ void gemm_cpu(bool trans_a, bool trans_b, int M, int N, int K,
             M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
 }
 
-void gemv_cpu(bool trans_a, int M, int N, float alpha, 
+void gemv_cpu(int trans_a, int M, int N, float alpha, 
         const float* A, const float* x, float beta, float* y)
 {
     cblas_sgemv(CblasRowMajor, trans_a ? CblasTrans : CblasNoTrans, M, N, alpha, A, N, x, 1, beta, y, 1);
@@ -108,7 +108,7 @@ static inline void gemm_tt(int M, int N, int K, float alpha,
 }
 
 
-void gemm_cpu(bool trans_a, bool trans_b, int M, int N, int K,
+void gemm_cpu(int trans_a, int trans_b, int M, int N, int K,
         float alpha, const float* A, const float* B, float beta, float* C)
 {
     int lda = trans_a ? K : M;
@@ -150,7 +150,7 @@ static inline void gemv_t(int M, int N, float alpha,
     }
 }
 
-void gemv_cpu(bool trans_a, int M, int N, float alpha, 
+void gemv_cpu(int trans_a, int M, int N, float alpha, 
         const float* A, const float* x, float beta, float* y)
 {
     int lda = trans_a ? N : M;

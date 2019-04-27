@@ -1,10 +1,10 @@
 #ifndef BLAS_H
 #define BLAS_H
 
-void gemm_cpu(bool trans_a, bool trans_b, int M, int N, int K,
+void gemm_cpu(int trans_a, int trans_b, int M, int N, int K,
         float alpha, const float* A, const float* B, float beta, float* C);
 
-void gemv_cpu(bool trans_a, int M, int N, float alpha, 
+void gemv_cpu(int trans_a, int M, int N, float alpha, 
         const float* A, const float* x, float beta, float* y);
 
 void axpy_cpu(int N, float alpha, const float* X, float* Y);

@@ -10,11 +10,11 @@ VPATH=./src/:./examples
 EXEC=scyte
 OBJDIR=./obj/
 
-CPP=g++
+CC=gcc-8
 OPTS=-Ofast
 LDFLAGS= -lm -pthread
 COMMON= -Iinclude/ -Isrc/
-CFLAGS=-Wall -Wno-unknown-pragmas -Wfatal-errors -fPIC -std=c++11
+CFLAGS=-Wall -Wno-unknown-pragmas -Wfatal-errors -fPIC
 
 ifeq ($(OPENMP), 1)
 CFLAGS+= -fopenmp
@@ -46,10 +46,10 @@ DEPS   = $(wildcard include/*.h) Makefile
 all: obj $(EXEC)
 
 $(EXEC): $(OBJS) $(EXECOBJS)
-	$(CPP) $(COMMON) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+	$(CC) $(COMMON) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
-$(OBJDIR)%.o: %.cpp $(DEPS)
-	$(CPP) $(COMMON) $(CFLAGS) -c $< -o $@
+$(OBJDIR)%.o: %.c $(DEPS)
+	$(CC) $(COMMON) $(CFLAGS) -c $< -o $@
 
 obj:
 	mkdir -p obj
