@@ -6,8 +6,8 @@
 #define SCYTE_MAX_DIMS 4
 
 typedef enum {
-	VAR = 0x1,
-	CONST = 0x2,
+    VAR = 0x1,
+    CONST = 0x2,
 } scyte_node_type;
 
 typedef struct scyte_node {
@@ -25,7 +25,7 @@ typedef struct scyte_node {
     float*      tmp;    // values produced in forward pass that are needed for the backward pass
     float*      params; // extra parameters needed by the node, e.g. stride and padding for convolution
 
-    int         num_children;
+    int                 num_children;
     struct scyte_node** children;
 } scyte_node;
 
