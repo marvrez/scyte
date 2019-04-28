@@ -25,6 +25,8 @@ typedef struct scyte_node {
     float*      tmp;    // values produced in forward pass that are needed for the backward pass
     float*      params; // extra parameters needed by the node, e.g. stride and padding for convolution
 
+    int         mark;   // describes the temporary state of a node, used internally
+
     int                 num_children;
     struct scyte_node** children;
 } scyte_node;
@@ -33,11 +35,21 @@ scyte_node** scyte_make_graph(int* num_nodes, int num_roots, scyte_node** roots)
 void scyte_free_graph(int n, scyte_node** nodes);
 scyte_node** scyte_copy_graph(int n, scyte_node** nodes, int batch_size);
 
-float* scyte_forward(int n, scyte_node** nodes, int from);
+// returns a pointer to nodes[to]->out, so be careful to not free the data!
+const float* scyte_forward(int n, scyte_node** nodes, int to);
 void scyte_backward(int n, scyte_node** nodes, int from);
 
 void scyte_print_graph(int n, scyte_node** nodes);
 int scyte_save_graph(FILE* fp, int num_nodes, scyte_node** nodes);
 scyte_node** scyte_load_graph(FILE* fp, int* num_nodes);
+
+static inline int scyte_num_elements(scyte_node* node)
+{
+    int n = 1;
+    for(int i = 0; i < node->num_dims; ++i) {
+        n *= node->shape[i];
+    }
+    return n;
+}
 
 #endif
