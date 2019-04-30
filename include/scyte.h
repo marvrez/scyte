@@ -10,8 +10,27 @@ typedef enum {
     CONST = 0x2,
 } scyte_node_type;
 
+typedef enum {
+    ADD,
+    SUB,
+    MULTIPLY,
+    SQUARE,
+    SIGMOID,
+    TANH,
+    RELU,
+    MATMUL,
+    AVG,
+    DROPOUT,
+    MAX,
+    SOFTMAX,
+    EXP,
+    UNKNOWN,
+} scyte_op_type;
+
 typedef struct scyte_node {
-    scyte_node_type type;
+    scyte_node_type type; // type of node – var, const, etc.
+    scyte_op_type op_type; // type of operation – add, multiply, subtract, etc.
+
     void    (*forward)	(struct scyte_node*);
     void    (*backward)	(struct scyte_node*);
 

@@ -3,14 +3,14 @@ OPENCV ?= 0
 OPENMP ?= 0
 DEBUG  ?= 0
 
-OBJ= main.o blas.o utils.o tensor.o scyte.o
+OBJ= main.o blas.o utils.o tensor.o scyte.o op.o
 EXECOBJA= 
 
 VPATH=./src/:./examples
 EXEC=scyte
 OBJDIR=./obj/
 
-CC=gcc-8
+CC=gcc
 OPTS=-Ofast
 LDFLAGS= -lm -pthread
 COMMON= -Iinclude/ -Isrc/
