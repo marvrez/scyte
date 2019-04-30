@@ -31,8 +31,8 @@ typedef struct scyte_node {
     scyte_node_type type; // type of node – var, const, etc.
     scyte_op_type op_type; // type of operation – add, multiply, subtract, etc.
 
-    void    (*forward)	(struct scyte_node*);
-    void    (*backward)	(struct scyte_node*);
+    void    (*forward)  (struct scyte_node*);
+    void    (*backward) (struct scyte_node*);
 
     unsigned    num_dims;
     int         shape[SCYTE_MAX_DIMS];
