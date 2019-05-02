@@ -6,6 +6,7 @@
 #define SCYTE_MAX_DIMS 4
 
 typedef enum {
+    INPUT = 0x0,
     VAR = 0x1,
     CONST = 0x2,
 } scyte_node_type;
@@ -37,8 +38,7 @@ typedef struct scyte_node {
     unsigned    num_dims;
     int         shape[SCYTE_MAX_DIMS];
 
-    float*      in;     // input values to the node
-    float*      out;    // output values produced by the node
+    float*      vals;   // stored values for node
     float*      delta;  // deltas provided by the output/top nodes
 
     float*      tmp;    // values produced in forward pass that are needed for the backward pass
@@ -50,11 +50,21 @@ typedef struct scyte_node {
     struct scyte_node** children;
 } scyte_node;
 
+typedef struct {
+    int n;              // number of nodes in the network
+    scyte_node** nodes; // array of the nodes in the network
+} scyte_network;
+
+// node->vals are set to fill_val if num_dims <=  1
+scyte_node* scyte_input(unsigned num_dims, int shape[]);
+scyte_node* scyte_const(unsigned num_dims, int shape[], float fill_val);
+scyte_node* scyte_var(unsigned num_dims, int shape[], float fill_val);
+
 scyte_node** scyte_make_graph(int* num_nodes, int num_roots, scyte_node** roots);
 void scyte_free_graph(int n, scyte_node** nodes);
 scyte_node** scyte_copy_graph(int n, scyte_node** nodes, int batch_size);
 
-// returns a pointer to nodes[to]->out, so be careful to not free the data!
+// returns a pointer to nodes[to]->vals, so be careful to not free the data!
 const float* scyte_forward(int n, scyte_node** nodes, int to);
 void scyte_backward(int n, scyte_node** nodes, int from);
 

@@ -1,15 +1,52 @@
 #include "scyte.h"
 
 #include "blas.h"
+#include "utils.h"
 
 #include <stdlib.h>
 #include <assert.h>
+#include <math.h>
+#include <string.h>
+
+static inline scyte_node* scyte_make_node(scyte_node_type type, unsigned num_dims, int shape[SCYTE_MAX_DIMS], float fill_val)
+{
+    scyte_node* node;
+    if(num_dims > SCYTE_MAX_DIMS) return NULL;
+    node = (scyte_node*)calloc(1, sizeof(scyte_node));
+    node->num_dims = num_dims, node->type = type;
+    memcpy(node->shape, shape, num_dims*sizeof(int));
+    if(type != INPUT) {
+        int num_elements = scyte_num_elements(node);
+        node->vals = (float*)calloc(num_elements, sizeof(float));
+        if (node->num_dims <= 1) set_cpu(num_elements, fill_val, node->vals);
+        else {
+            float s = 2.f / sqrtf((float)num_elements / node->shape[0]);
+            for(int i = 0; i < num_elements; ++i) node->vals[i] = s*random_uniform(-1, 1);
+        }
+    }
+    return node;
+}
+
+scyte_node* scyte_input(unsigned num_dims, int shape[])
+{
+    return scyte_make_node(INPUT, num_dims, shape, 0);
+}
+
+scyte_node* scyte_const(unsigned num_dims, int shape[], float fill_val)
+{
+    return scyte_make_node(CONST, num_dims, shape, fill_val);
+}
+
+scyte_node* scyte_var(unsigned num_dims, int shape[], float fill_val)
+{
+    return scyte_make_node(VAR, num_dims, shape, fill_val);
+}
 
 void scyte_free_graph(int n, scyte_node** nodes)
 {
     for(int i = 0; i < n; ++i) {
         scyte_node* node = nodes[i];
-        free(node->in); free(node->out); free(node->delta);
+        free(node->vals);free(node->delta);
         free(node->tmp); free(node->params);
         free(node->children); free(node);
     }
@@ -41,7 +78,7 @@ const float* scyte_forward(int n, scyte_node** nodes, int to)
             node->forward(node);
         }
     }
-    return nodes[to]->out;
+    return nodes[to]->vals;
 }
 
 void scyte_backward(int n, scyte_node** nodes, int from)
