@@ -146,5 +146,6 @@ void scyte_print_graph(int n, scyte_node** nodes)
                         : scyte_is_input(node) ? "input" : "N/A");
         putchar('\n');
     }
+    printf("----------------------------\n");
     for(i = 0; i < n; ++i) nodes[i]->mark = 0;
 }
