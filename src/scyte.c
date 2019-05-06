@@ -54,6 +54,14 @@ void scyte_free_graph(int n, scyte_node** nodes)
     free(nodes);
 }
 
+void scyte_copy_dim(const scyte_node* src, scyte_node* dst)
+{
+    dst->num_dims = src->num_dims;
+    if(src->num_dims){
+        memcpy(dst->shape, src->shape, src->num_dims*sizeof(int));
+    }
+}
+
 static inline void scyte_propagate_marks(int n, scyte_node** nodes)
 {
     for(int i = n-1; i>= 0; --i) {
@@ -115,14 +123,17 @@ void scyte_print_graph(int n, scyte_node** nodes)
 {
     int i, j;
     for(i = 0; i < n; ++i) nodes[i]->mark = i;
+    printf("$node\tshape\t\ttype\n");
+    printf("----------------------------\n");
     for(i = 0; i < n; ++i) {
         scyte_node* node = nodes[i];
-        puts("[");
+        printf("%d\t", i);
+        putchar('[');
         for(j = 0; j < node->num_dims; ++j) {
             if(j) putchar(',');
             printf("%d", node->shape[j]);
         }
-        printf("]\t");
+        printf("]\t\t");
         if(node->num_children > 0) {
             printf("%s(", scyte_get_op_string(node->op_type));
             for(j = 0; j < node->num_children; ++j) {

@@ -71,6 +71,8 @@ scyte_node** scyte_make_graph(int* num_nodes, int num_roots, scyte_node** roots)
 void scyte_free_graph(int n, scyte_node** nodes);
 scyte_node** scyte_copy_graph(int n, scyte_node** nodes, int batch_size);
 
+void scyte_copy_dim(const scyte_node* src, scyte_node* dst);
+
 // returns a pointer to nodes[to]->vals, so be careful to not free the data!
 const float* scyte_forward(int n, scyte_node** nodes, int to);
 void scyte_backward(int n, scyte_node** nodes, int from);
