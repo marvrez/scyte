@@ -1,6 +1,33 @@
 #include "op.h"
 
 #include <string.h>
+#include <stdlib.h>
+
+scyte_node* make_op_node(scyte_op_type type, int num_dims, int num_children)
+{
+    scyte_node* node;
+    if (num_dims >= SCYTE_MAX_DIMS) return NULL;
+    node = (scyte_node*)calloc(1, sizeof(scyte_node));
+    node->num_dims = num_dims, node->op_type = type, node->num_children = num_children;
+    if (node->num_children) {
+        node->children = (scyte_node**)calloc(node->num_children, sizeof(scyte_node*));
+    }
+    return node;
+}
+
+scyte_node* make_op1_node(scyte_op_type type, scyte_node* x)
+{
+    scyte_node* node = make_op_node(type, 0, 1);
+    node->children[0] = x;
+    return node;
+}
+
+scyte_node* make_op2_node(scyte_op_type type, scyte_node* x, scyte_node* y)
+{
+    scyte_node* node = make_op_node(type, 0, 2);
+    node->children[0] = x, node->children[1] = y;
+    return node;
+}
 
 char* scyte_get_op_string(scyte_op_type op_type)
 {
@@ -40,9 +67,4 @@ scyte_op_type scyte_get_op_type(char* s)
     if(strcmp(s, "exp")) return EXP;
     fprintf(stderr, "Couldn't find operation %s\n", s);
     return UNKNOWN;
-}
-
-action_func* scyte_get_op(scyte_op_type op_type)
-{
-
 }
