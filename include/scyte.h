@@ -11,6 +11,13 @@ typedef enum {
     CONST = 0x2,
 } scyte_node_type;
 
+#define scyte_has_gradient(p)  ((p)->type & VAR)
+
+#define scyte_is_operand(p)     ((p)->num_children == 0)
+#define scyte_is_var(p)         (scyte_is_operand(p) && scyte_has_gradient(p))
+#define scyte_is_const(p)       (scyte_is_operand(p) && ((p)->type & CONST))
+#define scyte_is_input(p)       (scyte_is_operand(p) && !scyte_has_gradient(p) && !((p)->type & CONST))
+
 typedef enum {
     ADD,
     SUB,

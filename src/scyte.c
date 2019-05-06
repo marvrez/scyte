@@ -1,4 +1,5 @@
 #include "scyte.h"
+#include "op.h"
 
 #include "blas.h"
 #include "utils.h"
@@ -108,4 +109,31 @@ void scyte_backward(int n, scyte_node** nodes, int from)
         }
     }
     for(i = 0; i <= from; ++i) nodes[i]->mark = 0;
+}
+
+void scyte_print_graph(int n, scyte_node** nodes)
+{
+    int i, j;
+    for(i = 0; i < n; ++i) nodes[i]->mark = i;
+    for(i = 0; i < n; ++i) {
+        scyte_node* node = nodes[i];
+        puts("[");
+        for(j = 0; j < node->num_dims; ++j) {
+            if(j) putchar(',');
+            printf("%d", node->shape[j]);
+        }
+        printf("]\t");
+        if(node->num_children > 0) {
+            printf("%s(", scyte_get_op_string(node->op_type));
+            for(j = 0; j < node->num_children; ++j) {
+                if(j) putchar(',');
+                printf("$%d", node->children[j]->mark);
+            }
+            printf(")");
+        }
+        else printf("%s", scyte_is_var(node) ? "var" : scyte_is_const(node) ? "const"
+                        : scyte_is_input(node) ? "input" : "N/A");
+        putchar('\n');
+    }
+    for(i = 0; i < n; ++i) nodes[i]->mark = 0;
 }
