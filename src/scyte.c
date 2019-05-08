@@ -28,19 +28,24 @@ static inline scyte_node* scyte_make_node(scyte_node_type type, unsigned num_dim
     return node;
 }
 
-scyte_node* scyte_input(unsigned num_dims, int shape[])
+scyte_node* scyte_input(unsigned num_dims, int shape[SCYTE_MAX_DIMS])
 {
     return scyte_make_node(INPUT, num_dims, shape, 0);
 }
 
-scyte_node* scyte_const(unsigned num_dims, int shape[], float fill_val)
+scyte_node* scyte_const(unsigned num_dims, int shape[SCYTE_MAX_DIMS], float fill_val)
 {
     return scyte_make_node(CONST, num_dims, shape, fill_val);
 }
 
-scyte_node* scyte_var(unsigned num_dims, int shape[], float fill_val)
+scyte_node* scyte_var(unsigned num_dims, int shape[SCYTE_MAX_DIMS], float fill_val)
 {
     return scyte_make_node(VAR, num_dims, shape, fill_val);
+}
+
+scyte_node** scyte_make_graph(int* num_nodes, int num_roots, scyte_node** roots)
+{
+    return NULL;
 }
 
 void scyte_free_graph(int n, scyte_node** nodes)
