@@ -36,7 +36,7 @@ float randn()
 
 float random_normal(float mu, float sigma)
 {
-	return mu + sigma*randn();
+    return mu + sigma*randn();
 }
 
 float random_uniform(float min, float max)
