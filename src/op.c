@@ -22,6 +22,12 @@ scyte_node* make_op1_node(scyte_op_type type, scyte_node* x)
     return node;
 }
 
+void free_op_node(scyte_node* node)
+{
+    free(node->params);
+    free(node->children); free(node);
+}
+
 scyte_node* make_op2_node(scyte_op_type type, scyte_node* x, scyte_node* y)
 {
     scyte_node* node = make_op_node(type, 0, 2);
@@ -65,6 +71,16 @@ scyte_op_type scyte_get_op_type(char* s)
     if(strcmp(s, "max")) return MAX;
     if(strcmp(s, "softmax")) return SOFTMAX;
     if(strcmp(s, "exp")) return EXP;
-    fprintf(stderr, "Couldn't find operation %s\n", s);
+    fprintf(stderr, "couldn't find operation %s\n", s);
     return UNKNOWN;
+}
+
+void scyte_validate_node(scyte_node* node)
+{
+    for(int i = 0; i < node->num_children; ++i) {
+        if(scyte_has_gradient(node->children[i])) {
+            node->type = VAR;
+            break;
+        }
+    }
 }
