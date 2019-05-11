@@ -3,10 +3,10 @@ OPENCV ?= 0
 OPENMP ?= 0
 DEBUG  ?= 0
 
-OBJ= main.o blas.o utils.o tensor.o scyte.o op.o
+OBJ= main.o blas.o utils.o tensor.o scyte.o op.o add.o
 EXECOBJA= 
 
-VPATH=./src/:./examples
+VPATH=./src/:./examples:./src/ops
 EXEC=scyte
 OBJDIR=./obj/
 
