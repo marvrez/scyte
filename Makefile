@@ -3,7 +3,7 @@ OPENCV ?= 0
 OPENMP ?= 0
 DEBUG  ?= 0
 
-OBJ= main.o blas.o utils.o tensor.o scyte.o op.o add.o
+OBJ= main.o blas.o utils.o tensor.o scyte.o op.o add.o sub.o
 EXECOBJA= 
 
 VPATH=./src/:./examples:./src/ops

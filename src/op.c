@@ -22,17 +22,17 @@ scyte_node* make_op1_node(scyte_op_type type, scyte_node* x)
     return node;
 }
 
-void free_op_node(scyte_node* node)
-{
-    free(node->params);
-    free(node->children); free(node);
-}
-
 scyte_node* make_op2_node(scyte_op_type type, scyte_node* x, scyte_node* y)
 {
     scyte_node* node = make_op_node(type, 0, 2);
     node->children[0] = x, node->children[1] = y;
     return node;
+}
+
+void free_op_node(scyte_node* node)
+{
+    free(node->params);
+    free(node->children); free(node);
 }
 
 char* scyte_get_op_string(scyte_op_type op_type)

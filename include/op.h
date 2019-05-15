@@ -4,6 +4,7 @@
 #include "scyte.h"
 
 #include "ops/add.h"
+#include "ops/sub.h"
 
 scyte_node* make_op_node(scyte_op_type type, int num_dims, int num_children);
 scyte_node* make_op1_node(scyte_op_type type, scyte_node* x);
