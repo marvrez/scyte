@@ -32,7 +32,7 @@ typedef enum {
     MAX,
     SOFTMAX,
     EXP,
-    UNKNOWN,
+    NOP,
 } scyte_op_type;
 
 typedef struct scyte_node {

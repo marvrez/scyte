@@ -51,7 +51,7 @@ char* scyte_get_op_string(scyte_op_type op_type)
         case MAX: return "max";
         case SOFTMAX: return "softmax";
         case EXP: return "exp";
-        case UNKNOWN: default: break;
+        case NOP: default: break;
     }
     return "unknown";
 }
@@ -72,7 +72,7 @@ scyte_op_type scyte_get_op_type(char* s)
     if(strcmp(s, "softmax")) return SOFTMAX;
     if(strcmp(s, "exp")) return EXP;
     fprintf(stderr, "couldn't find operation %s\n", s);
-    return UNKNOWN;
+    return NOP;
 }
 
 void scyte_validate_node(scyte_node* node)
