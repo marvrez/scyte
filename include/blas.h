@@ -18,6 +18,8 @@ void sub_cpu(int n, const float* x, const float* y, float* z);
 void mul_cpu(int n, const float* x, const float* y, float* z);
 void div_cpu(int n, const float* x, const float* y, float* z);
 
+void mul_sum_cpu(int n, const float* x, const float* y, float* z);
+
 void pow_cpu(int n, float alpha, const float* x, float* y);
 void scale_cpu(int n, float alpha, const float* x, float* y);
 void bias_cpu(int n, float alpha, const float* x, float* y);

@@ -213,6 +213,13 @@ void div_cpu(int n, const float* x, const float* y, float* z)
     }
 }
 
+void mul_sum_cpu(int n, const float* x, const float* y, float* z)
+{
+    for(int i = 0; i < n; ++i) {
+        z[i] += x[i]*y[i];
+    }
+}
+
 void pow_cpu(int n, float alpha, const float* x, float* y)
 {
     for(int i = 0; i < n; ++i) {
