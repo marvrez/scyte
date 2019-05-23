@@ -4,10 +4,11 @@ Scyte is a neural network framework in C –  it is fast, lightweight and easy t
 
 ## Building and running scyte
 
-To build scyte execute:
+To clone and build scyte execute:
 ```sh
+git clone git@github.com:marvrez/scyte.git
+cd scyte
 make -j
-
 ```
 
 If no errors popped up, you can run it by executing:
