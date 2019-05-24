@@ -15,7 +15,6 @@ scyte_node* scyte_sigmoid(scyte_node* x)
 {
     scyte_node* node = make_op1_node(SIGMOID, x);
     node->forward = scyte_sigmoid_forward, node->backward = scyte_sigmoid_backward;
-    scyte_validate_node(node);
     if(!sync_dims(node)) {
         free_op_node(node);
         return NULL;

@@ -13,7 +13,6 @@ scyte_node* scyte_relu(scyte_node* x)
 {
     scyte_node* node = make_op1_node(RELU, x);
     node->forward = scyte_relu_forward, node->backward = scyte_relu_backward;
-    scyte_validate_node(node);
     if(!sync_dims(node)) {
         free_op_node(node);
         return NULL;

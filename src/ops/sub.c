@@ -22,7 +22,6 @@ scyte_node* scyte_sub(scyte_node* x, scyte_node* y)
 {
     scyte_node* node = make_op2_node(SUB, x, y);
     node->forward = scyte_sub_forward, node->backward = scyte_sub_backward;
-    scyte_validate_node(node);
     if(!sync_dims(node)) {
         free_op_node(node);
         return NULL;

@@ -11,12 +11,10 @@ static inline int sync_dims(scyte_node* node)
     return 1;
 }
 
-
 scyte_node* scyte_tanh(scyte_node* x)
 {
     scyte_node* node = make_op1_node(TANH, x);
     node->forward = scyte_tanh_forward, node->backward = scyte_tanh_backward;
-    scyte_validate_node(node);
     if(!sync_dims(node)) {
         free_op_node(node);
         return NULL;
