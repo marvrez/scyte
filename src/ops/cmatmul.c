@@ -1,5 +1,6 @@
 #include "ops/cmatmul.h"
 
+#include "logger.h"
 #include "blas.h"
 #include "op.h"
 
@@ -26,7 +27,7 @@ static inline int sync_dims(scyte_node* node)
     get_rows_cols(y, num_cols, &num_rows_y, &num_cols_y);
 
     if(num_cols_x != num_cols_y) {
-        fprintf(stderr, "[scyte_cmatmul] dimensions (%d != %d) were not properly synced, returning NULL\n", num_cols_x, num_cols_y);
+        LOG_ERRORF("dimensions (%d != %d) were not properly synced, returning NULL\n", num_cols_x, num_cols_y);
         return 0;
     }
     node->num_dims = 2;

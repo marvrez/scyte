@@ -1,5 +1,6 @@
 #include "ops/select.h"
 
+#include "logger.h"
 #include "op.h"
 #include "blas.h"
 
@@ -35,12 +36,12 @@ static inline int sync_dims(scyte_node* node)
         scyte_node* child = node->children[i];
         int num_elements_children = scyte_num_elements(child);
         if(child->num_dims != chosen_node->num_dims || num_elements_children != n) {
-            fprintf(stderr, "[scyte_select] dimensions %d != %d for child %d was not properly synced, returning NULL\n",
-                    i, n, num_elements_children);
+            LOG_ERRORF("dimensions %d != %d for child %d was not properly synced, returning NULL\n",
+                i, n, num_elements_children);
             return 0;
         }
     }
-    scyte_copy_dim(chosen_node, node);
+    scyte_copy_shape(chosen_node, node);
     return 1;
 }
 

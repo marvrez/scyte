@@ -1,6 +1,7 @@
 #include "ops/mse.h"
 
 #include "op.h"
+#include "logger.h"
 
 #include <stdio.h>
 
@@ -9,7 +10,7 @@ static inline int sync_dims(scyte_node* node)
     int n0 = scyte_num_elements(node->children[0]);
     int n1 = scyte_num_elements(node->children[1]);
     if(n0 != n1) {
-        fprintf(stderr, "[scyte_mse] dimensions (%d != %d) were not properly synced, returning NULL\n", n0, n1);
+        LOG_ERRORF("dimensions (%d != %d) were not properly synced, returning NULL\n", n0, n1);
         return 0;
     }
     node->num_dims = 0;

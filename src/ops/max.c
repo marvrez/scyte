@@ -1,6 +1,7 @@
 #include "ops/max.h"
 
 #include "op.h"
+#include "logger.h"
 #include "blas.h"
 
 #include <stdio.h>
@@ -13,12 +14,12 @@ static inline int sync_dims(scyte_node* node)
     for(int i = 1; i < node->num_children; ++i) {
         int num_elements_children = scyte_num_elements(node->children[i]);
         if(num_elements_children != n) {
-            fprintf(stderr, "[scyte_max] dimensions %d != %d for child %d was not properly synced, returning NULL\n",
-                    i, n, num_elements_children);
+            LOG_ERRORF("dimensions %d != %d for child %d was not properly synced, returning NULL\n",
+                i, n, num_elements_children);
             return 0;
         }
     }
-    scyte_copy_dim(node->children[0], node);
+    scyte_copy_shape(node->children[0], node);
     // node->tmp stores the index for the maximum value 
     // of the vals for a child
     int* max_val_idx = (int*)calloc(n, sizeof(int));

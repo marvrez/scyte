@@ -1,5 +1,6 @@
 #include "ops/sub.h"
 
+#include "logger.h"
 #include "blas.h"
 #include "op.h"
 
@@ -11,10 +12,10 @@ static inline int sync_dims(scyte_node* node)
     int n0 = scyte_num_elements(node->children[0]);
     int n1 = scyte_num_elements(node->children[1]);
     if(n0 % n1 != 0) {
-        fprintf(stderr, "[scyte_sub] dimensions (%d %% %d != 0) were not properly synced, returning NULL\n", n0, n1);
+        LOG_ERRORF("dimensions (%d %% %d != 0) were not properly synced, returning NULL\n", n0, n1);
         return 0;
     }
-    scyte_copy_dim(node->children[0], node);
+    scyte_copy_shape(node->children[0], node);
     return 1;
 }
 

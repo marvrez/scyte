@@ -2,6 +2,7 @@
 
 #include "op.h"
 #include "blas.h"
+#include "logger.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -32,7 +33,7 @@ static inline int sync_dims(scyte_node* node, int axis)
 {
     scyte_node* operand = node->children[0];
     if(axis < 0 || axis >= operand->num_dims) {
-        fprintf(stderr, "[scyte_reduce_mean] axis must be in range [0, %d]\n", operand->num_dims -1);
+        LOG_ERRORF("[scyte_reduce_mean] axis must be in range [0, %d]\n", operand->num_dims-1);
         return -1;
     }
     node->num_dims = operand->num_dims - 1;

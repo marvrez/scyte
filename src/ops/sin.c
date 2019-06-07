@@ -7,7 +7,7 @@
 
 static inline int sync_dims(scyte_node* node)
 {
-    scyte_copy_dim(node->children[0], node);
+    scyte_copy_shape(node->children[0], node);
     return 1;
 }
 
