@@ -2,7 +2,9 @@
 
 #include <sys/time.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
+#include <string.h>
 
 #define M_TWO_PI 6.2831853071795864769252866f
 
@@ -47,4 +49,22 @@ float random_uniform(float min, float max)
         max = swap;
     }
     return ((float)rand()/RAND_MAX * (max - min)) + min;
+}
+
+char* get_shape_string(int n, int* shape)
+{
+    int i;
+    if(shape == NULL || n <= 0) return NULL;
+    for(i = 0; i < n && shape[i] <= 0; ++i) {}
+	char* ret = malloc(256*sizeof(char)), tmp[32];
+    sprintf(tmp, "(%d", shape[i++]);
+    strcat(ret, tmp);
+    for(; i < n; ++i) {
+        memset(tmp, 0, sizeof(tmp));
+        if(shape[i] < 0) strcpy(tmp,",newaxis");
+        else sprintf(tmp, ",%d", shape[i]);
+        strcat(ret, tmp);
+    }
+    strcat(ret, ")");
+    return ret;
 }

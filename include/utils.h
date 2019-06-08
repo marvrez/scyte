@@ -6,4 +6,6 @@ float randn();
 float random_normal(float mu, float sigma);
 float random_uniform(float min, float max);
 
+char* get_shape_string(int n, int* shape);
+
 #endif
