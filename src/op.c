@@ -1,5 +1,7 @@
 #include "op.h"
 
+#include "logger.h"
+
 #include <string.h>
 #include <stdlib.h>
 
@@ -19,6 +21,7 @@ scyte_node* make_op1_node(scyte_op_type type, scyte_node* x)
 {
     scyte_node* node = make_op_node(type, 0, 1);
     node->children[0] = x;
+    scyte_validate_node(node);
     return node;
 }
 
@@ -26,6 +29,15 @@ scyte_node* make_op2_node(scyte_op_type type, scyte_node* x, scyte_node* y)
 {
     scyte_node* node = make_op_node(type, 0, 2);
     node->children[0] = x, node->children[1] = y;
+    scyte_validate_node(node);
+    return node;
+}
+
+scyte_node* make_opn_node(scyte_op_type type, int n, scyte_node** x)
+{
+    scyte_node* node = make_op_node(type, 0, n);
+    for(int i = 0; i < n; ++i) node->children[i] = x[i];
+    scyte_validate_node(node);
     return node;
 }
 
@@ -45,12 +57,25 @@ char* scyte_get_op_string(scyte_op_type op_type)
         case SIGMOID: return "sigmoid";
         case TANH: return "tanh";
         case RELU: return "relu";
+        case CMATMUL: return "cmatmul";
         case MATMUL: return "matmul";
         case AVG: return "avg";
+        case SELECT: return "select";
         case DROPOUT: return "dropout";
         case MAX: return "max";
         case SOFTMAX: return "softmax";
         case EXP: return "exp";
+        case LOG: return "log";
+        case SIN: return "sin";
+        case MSE: return "mse";
+        case RESHAPE: return "reshape";
+        case CONCAT: return "concat";
+        case SLICE: return "slice";
+        case NORMALIZE: return "normalize";
+        case REDUCE_SUM: return "reduce_sum";
+        case REDUCE_MEAN: return "reduce_mean";
+        case CATEGORICALXENT: return "categoricalxent";
+        case LOGXENT: return "logxent";
         case NOP: default: break;
     }
     return "unknown";
@@ -65,13 +90,26 @@ scyte_op_type scyte_get_op_type(char* s)
     if(strcmp(s, "sigmoid")) return SIGMOID;
     if(strcmp(s, "tanh")) return TANH;
     if(strcmp(s, "relu")) return RELU;
+    if(strcmp(s, "cmatmul")) return CMATMUL;
     if(strcmp(s, "matmul")) return MATMUL;
     if(strcmp(s, "avg")) return AVG;
+    if(strcmp(s, "select")) return SELECT;
     if(strcmp(s, "dropout")) return DROPOUT;
     if(strcmp(s, "max")) return MAX;
     if(strcmp(s, "softmax")) return SOFTMAX;
     if(strcmp(s, "exp")) return EXP;
-    fprintf(stderr, "couldn't find operation %s\n", s);
+    if(strcmp(s, "log")) return LOG;
+    if(strcmp(s, "sin")) return SIN;
+    if(strcmp(s, "mse")) return MSE;
+    if(strcmp(s, "reshape")) return RESHAPE;
+    if(strcmp(s, "concat")) return CONCAT;
+    if(strcmp(s, "slice")) return SLICE;
+    if(strcmp(s, "normalize")) return NORMALIZE;
+    if(strcmp(s, "reduce_sum")) return REDUCE_SUM;
+    if(strcmp(s, "reduce_mean")) return REDUCE_MEAN;
+    if(strcmp(s, "categoricalxent")) return CATEGORICALXENT;
+    if(strcmp(s, "logxent")) return LOGXENT;
+    LOG_ERRORF("couldn't find operation %s", s);
     return NOP;
 }
 
@@ -79,7 +117,7 @@ void scyte_validate_node(scyte_node* node)
 {
     for(int i = 0; i < node->num_children; ++i) {
         if(scyte_has_gradient(node->children[i])) {
-            node->type = VAR;
+            node->type |= VAR;
             break;
         }
     }

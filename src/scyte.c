@@ -59,7 +59,7 @@ void scyte_free_graph(int n, scyte_node** nodes)
     free(nodes);
 }
 
-void scyte_copy_dim(const scyte_node* src, scyte_node* dst)
+void scyte_copy_shape(const scyte_node* src, scyte_node* dst)
 {
     dst->num_dims = src->num_dims;
     if(src->num_dims){

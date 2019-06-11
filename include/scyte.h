@@ -5,11 +5,11 @@
 
 #define SCYTE_MAX_DIMS 4
 
-typedef enum {
-    INPUT = 0x0,
-    VAR = 0x1,
-    CONST = 0x2,
-} scyte_node_type;
+typedef unsigned char scyte_node_type;
+
+#define INPUT   0x1
+#define VAR     0x2
+#define CONST   0x4
 
 #define scyte_has_gradient(p)  ((p)->type & VAR)
 
@@ -27,11 +27,24 @@ typedef enum {
     TANH,
     RELU,
     MATMUL,
+    CMATMUL,
     AVG,
-    DROPOUT,
     MAX,
+    SELECT,
+    DROPOUT,
     SOFTMAX,
     EXP,
+    LOG,
+    SIN,
+    MSE,
+    LOGXENT,
+    CATEGORICALXENT,
+    REDUCE_MEAN,
+    REDUCE_SUM,
+    RESHAPE,
+    CONCAT,
+    SLICE,
+    NORMALIZE,
     NOP,
 } scyte_op_type;
 
@@ -48,8 +61,8 @@ typedef struct scyte_node {
     float*      vals;   // stored values for node
     float*      delta;  // deltas provided by the output/top nodes
 
-    float*      tmp;    // values produced in forward pass that are needed for the backward pass
-    float*      params; // extra parameters needed by the node, e.g. stride and padding for convolution
+    void*       tmp;    // values produced in forward pass that are needed for the backward pass
+    void*       params; // extra parameters needed by the node, e.g. stride and padding for convolution
 
     int         mark;   // describes the temporary state of a node, used internally
 
@@ -71,7 +84,7 @@ scyte_node** scyte_make_graph(int* num_nodes, int num_roots, scyte_node** roots)
 void scyte_free_graph(int n, scyte_node** nodes);
 scyte_node** scyte_copy_graph(int n, scyte_node** nodes, int batch_size);
 
-void scyte_copy_dim(const scyte_node* src, scyte_node* dst);
+void scyte_copy_shape(const scyte_node* src, scyte_node* dst);
 
 // returns a pointer to nodes[to]->vals, so be careful to not free the data!
 const float* scyte_forward(int n, scyte_node** nodes, int to);
