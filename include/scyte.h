@@ -80,7 +80,7 @@ scyte_node* scyte_input(unsigned num_dims, int shape[SCYTE_MAX_DIMS]);
 scyte_node* scyte_const(unsigned num_dims, int shape[SCYTE_MAX_DIMS], float fill_val);
 scyte_node* scyte_var(unsigned num_dims, int shape[SCYTE_MAX_DIMS], float fill_val);
 
-scyte_node** scyte_make_graph(int* num_nodes, int num_roots, scyte_node** roots);
+scyte_node** scyte_topological_sort(int* num_nodes, int num_roots, scyte_node** roots);
 void scyte_free_graph(int n, scyte_node** nodes);
 scyte_node** scyte_copy_graph(int n, scyte_node** nodes, int batch_size);
 
