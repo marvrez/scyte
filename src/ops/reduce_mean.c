@@ -21,15 +21,6 @@ static inline void set_axis(scyte_node* node, int axis)
     node->params_size = sizeof(int);
 }
 
-// shape0 is product of all shapes before axis,
-// while shape1 is product of all shapes after axis
-static inline void get_reduced_dimensions(scyte_node* node, int axis, int* shape0, int* shape1)
-{
-    *shape0 = *shape1 = 1;
-    for(int i = 0; i < axis; ++i) *shape0 *= node->shape[i];
-    for(int i = axis + 1; i < node->num_dims; ++i) *shape1 *= node->shape[i];
-}
-
 static inline int sync_dims(scyte_node* node, int axis)
 {
     scyte_node* operand = node->children[0];

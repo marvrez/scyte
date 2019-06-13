@@ -113,6 +113,13 @@ scyte_op_type scyte_get_op_type(char* s)
     return NOP;
 }
 
+void get_reduced_dimensions(scyte_node* node, int axis, int* shape0, int* shape1)
+{
+    *shape0 = *shape1 = 1;
+    for(int i = 0; i < axis; ++i) *shape0 *= node->shape[i];
+    for(int i = axis + 1; i < node->num_dims; ++i) *shape1 *= node->shape[i];
+}
+
 void scyte_validate_node(scyte_node* node)
 {
     for(int i = 0; i < node->num_children; ++i) {
