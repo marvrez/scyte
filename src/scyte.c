@@ -2,6 +2,8 @@
 #include "op.h"
 
 #include "blas.h"
+#include "list.h"
+#include "logger.h"
 #include "utils.h"
 
 #include <stdlib.h>
@@ -43,10 +45,91 @@ scyte_node* scyte_var(unsigned num_dims, int shape[SCYTE_MAX_DIMS], float fill_v
     return scyte_make_node(VAR, num_dims, shape, fill_val);
 }
 
-scyte_node** scyte_topological_sort(int* num_nodes, int num_roots, scyte_node** roots)
+static inline void scyte_propagate_gradient_marks(int n, scyte_node** nodes)
 {
-    // TODO
-    return NULL;
+    for(int i = 0; i < n; ++i) {
+        scyte_node* node = nodes[i];
+        if(node->num_children == 0) continue;
+        int j;
+        for(j = 0; j < node->num_children; ++j) {
+            if(scyte_has_gradient(node->children[j])) {
+                break;
+            }
+        }
+        if(j < node->num_children) node->type |= VAR;
+        else node->type &= ~VAR;
+    }
+}
+
+static void scyte_allocate_tensors(int n, scyte_node** nodes)
+{
+    scyte_propagate_gradient_marks(n, nodes);
+    for(int i = 0; i < n; ++i) {
+        scyte_node* node = nodes[i];
+        if(node->num_children == 0) continue;
+        node->vals = (float*)realloc(node->vals, scyte_num_elements(node)*sizeof(float));
+        if(scyte_has_gradient(node)) {
+            node->delta = (float*)realloc(node->delta, scyte_num_elements(node)*sizeof(float));
+        }
+    }
+}
+
+scyte_node** scyte_make_graph(int* num_nodes, int num_roots, scyte_node** roots)
+{
+    list* l = make_list();
+    list* out = make_list();
+    // `mark` is the in-degree count, left shifted by 1
+    for(int i = 0; i < num_roots; ++i) {
+        roots[i]->mark = 1;
+        list_append(l, roots[i]);
+    }
+
+    // traverse graph to calculate in-degrees of the nodes
+    while(l->size) {
+        scyte_node* node = list_pop(l);
+        for(int i = 0; i < node->num_children; ++i) {
+            scyte_node* child = node->children[i];
+            // child hasn't been visited – explore it
+            if(child->mark == 0) list_append(l, child);
+            child->mark += 0x2;
+        }
+    }
+    // push all nodes with in-degree 0
+    for(int i = 0; i < num_roots; ++i) {
+        if(roots[i]->mark >> 1 == 0) {
+            list_append(l, roots[i]);
+        }
+    }
+    // perform kahn's algorithm to topological sort the graph
+    while(l->size) {
+        scyte_node* node = list_pop(l);
+        list_append(out, node);
+        // iterate through all childrens and decrease their in-degree by 2
+        // (since it's left-shifted by 1)
+        for(int i = 0; i < node->num_children; ++i) {
+            scyte_node* child = node->children[i];
+            child->mark -= 0x2;
+            if(child->mark >> 1 == 0) list_append(l, child);
+        }
+    }
+
+    // check for cycles
+    list_node* n = out->head;
+    while(n) {
+        scyte_node* node = n->data;
+        if(node->mark >> 1 != 0) {
+            LOG_ERROR("detected cycle in the computational graph");
+            assert(0);
+        }
+        node->mark = 0x0;
+        n = n->next;
+    }
+    scyte_node** graph = (scyte_node**)list_to_reverse_array(out);
+    *num_nodes = out->size;
+    scyte_allocate_tensors(*num_nodes, graph);
+
+    free_list(l);
+    return graph;
 }
 
 void scyte_free_graph(int n, scyte_node** nodes)
@@ -154,4 +237,9 @@ void scyte_print_graph(int n, scyte_node** nodes)
     }
     printf("----------------------------\n");
     for(i = 0; i < n; ++i) nodes[i]->mark = 0;
+}
+
+void scyte_save_graph(FILE* fp, int num_nodes, scyte_node** nodes)
+{
+    // TODO
 }

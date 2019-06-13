@@ -19,7 +19,7 @@ typedef unsigned char scyte_node_type;
 #define scyte_is_input(p)       (scyte_is_operand(p) && !scyte_has_gradient(p) && !((p)->type & CONST))
 
 typedef enum {
-    ADD,
+    ADD = 0,
     SUB,
     MULTIPLY,
     SQUARE,
@@ -63,6 +63,7 @@ typedef struct scyte_node {
 
     void*       tmp;    // values produced in forward pass that are needed for the backward pass
     void*       params; // extra parameters needed by the node, e.g. stride and padding for convolution
+    size_t      params_size;
 
     int         mark;   // describes the temporary state of a node, used internally
 
@@ -80,7 +81,7 @@ scyte_node* scyte_input(unsigned num_dims, int shape[SCYTE_MAX_DIMS]);
 scyte_node* scyte_const(unsigned num_dims, int shape[SCYTE_MAX_DIMS], float fill_val);
 scyte_node* scyte_var(unsigned num_dims, int shape[SCYTE_MAX_DIMS], float fill_val);
 
-scyte_node** scyte_topological_sort(int* num_nodes, int num_roots, scyte_node** roots);
+scyte_node** scyte_make_graph(int* num_nodes, int num_roots, scyte_node** roots);
 void scyte_free_graph(int n, scyte_node** nodes);
 scyte_node** scyte_copy_graph(int n, scyte_node** nodes, int batch_size);
 
@@ -91,7 +92,7 @@ const float* scyte_forward(int n, scyte_node** nodes, int to);
 void scyte_backward(int n, scyte_node** nodes, int from);
 
 void scyte_print_graph(int n, scyte_node** nodes);
-int scyte_save_graph(FILE* fp, int num_nodes, scyte_node** nodes);
+void scyte_save_graph(FILE* fp, int num_nodes, scyte_node** nodes);
 scyte_node** scyte_load_graph(FILE* fp, int* num_nodes);
 
 static inline int scyte_num_elements(scyte_node* node)

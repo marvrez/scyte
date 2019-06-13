@@ -21,6 +21,7 @@ static inline void set_shape(scyte_node* node, int n, int* shape)
         }
     }
     node->params = shape_params;
+    node->params_size = sizeof(int)*n;
 }
 
 static inline int sync_dims(scyte_node* node, int n, int* shape)

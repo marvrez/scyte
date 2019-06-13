@@ -15,12 +15,11 @@ list* make_list()
 
 void* list_pop(list* l) 
 {
-    if(!l->head) return NULL;
-    list_node* n = l->head;
+    if(!l->tail) return NULL;
+    list_node* n = l->tail;
     void* data = n->data;
-    l->head = n->next;
-    if(l->head) l->head->prev = NULL;
-
+    l->tail = l->tail->prev;
+    if(l->tail) l->tail->next = NULL;
     free(n);
     --l->size;
     

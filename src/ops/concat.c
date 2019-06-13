@@ -20,6 +20,7 @@ static inline void set_axis(scyte_node* node, int axis)
     int* axis_param = (int*)calloc(1, sizeof(int));
     *axis_param = axis;
     node->params = axis_param;
+    node->params_size = sizeof(int);
 }
 
 // shape0 is product of all shapes before axis,

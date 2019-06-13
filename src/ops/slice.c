@@ -22,6 +22,7 @@ static inline void set_slice_params(scyte_node* node, int axis, int start, int s
     int* slice_params = (int*)calloc(3, sizeof(int));
     slice_params[0] = axis, slice_params[1] = start, slice_params[2] = size;
     node->params = slice_params;
+    node->params_size = sizeof(int)*3;
 }
 
 // shape0 is product of all shapes before axis,

@@ -25,6 +25,7 @@ static inline void set_node_idx(scyte_node* node, int node_idx)
     int* node_idx_ptr = (int*)calloc(1, sizeof(int));
     *node_idx_ptr = node_idx;
     node->params = node_idx_ptr;
+    node->params_size = sizeof(int);
 }
 
 static inline int sync_dims(scyte_node* node)
