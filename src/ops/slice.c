@@ -58,7 +58,9 @@ void scyte_slice_forward(scyte_node* node)
     get_reduced_dimensions(node, axis, &shape0, &shape1);
 
     for(int i = 0; i < shape0; ++i) {
-        copy_cpu(size*shape1, &child->vals[(i*child->shape[axis] + start)*shape1], &node->vals[i*node->shape[axis]*shape1]);
+        copy_cpu(size*shape1, 
+                &child->vals[(i*child->shape[axis] + start)*shape1], 
+                &node->vals[i*node->shape[axis]*shape1]);
     }
 }
 
@@ -73,6 +75,8 @@ void scyte_slice_backward(scyte_node* node)
     get_reduced_dimensions(node, axis, &shape0, &shape1);
 
     for(int i = 0; i < shape0; ++i) {
-        axpy_cpu(size*shape1, 1.f, &node->delta[i*node->shape[axis]*shape1], &child->delta[(i*child->shape[axis] + start)*shape1]);
+        axpy_cpu(size*shape1, 1.f, 
+                &node->delta[i*node->shape[axis]*shape1], 
+                &child->delta[(i*child->shape[axis] + start)*shape1]);
     }
 }
