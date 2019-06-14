@@ -68,3 +68,17 @@ char* get_shape_string(int n, int* shape)
     strcat(ret, ")");
     return ret;
 }
+
+int qsortf_cmp(const void* a, const void* b)
+{
+    float af = *(const float*)a;
+    float bf = *(const float*)b;
+    if (af < bf) return -1;
+    if (af > bf) return +1;
+    return 0;
+}
+
+void qsortf(int n, float* data)
+{
+    qsort(data, n, sizeof(float), qsortf_cmp);
+}

@@ -8,4 +8,7 @@ float random_uniform(float min, float max);
 
 char* get_shape_string(int n, int* shape);
 
+ // sorts in increasing value
+void qsortf(int n, float* data);
+
 #endif
