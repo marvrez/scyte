@@ -24,7 +24,8 @@ static struct timeb timeb_s;
 static char logbuffer[4096];
 
 #define BT_SIZE  16
-static void _BACKTRACE() {
+static inline void _BACKTRACE()
+{
     int num_calls;
     void* bt_buffer[BT_SIZE];
 
@@ -34,7 +35,7 @@ static void _BACKTRACE() {
 }
 #undef BT_SIZE
 
-static void _LOG_CORE(char level, struct timeb* timebp, pid_t pid,
+static inline void _LOG_CORE(char level, struct timeb* timebp, pid_t pid,
                      const char* file,
                      int line,
                      const char* func,
