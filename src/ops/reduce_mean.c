@@ -25,7 +25,7 @@ static inline int sync_dims(scyte_node* node, int axis)
 {
     scyte_node* operand = node->children[0];
     if(axis < 0 || axis >= operand->num_dims) {
-        LOG_ERRORF("[scyte_reduce_mean] axis must be in range [0, %d]\n", operand->num_dims-1);
+        LOG_ERRORF("axis %d isn't in in range [-%d, %d)\n", axis, operand->num_dims, operand->num_dims - 1);
         return -1;
     }
     node->num_dims = operand->num_dims - 1;
@@ -42,6 +42,7 @@ scyte_node* scyte_reduce_mean(scyte_node* node, int axis)
 {
     scyte_node* out = make_op1_node(REDUCE_MEAN, node);
     out->forward = scyte_reduce_mean_forward, out->backward = scyte_reduce_mean_backward;
+    if(axis < 0) axis = node->num_dims + axis;
     set_axis(out, axis);
     if(!sync_dims(out, axis)) {
         free_op_node(out);
@@ -60,6 +61,7 @@ void scyte_reduce_mean_forward(scyte_node* node)
     get_reduced_dimensions(operand, axis, &shape0, &shape1);
 
     set_cpu(scyte_num_elements(node), 0.f, node->vals);
+    #pragma omp parallel for
     for(int i = 0; i < shape0; ++i) {
         int out_base_idx = i*shape1;
         for(int j = 0; j < axis_shape; ++j) {
@@ -82,6 +84,7 @@ void scyte_reduce_mean_backward(scyte_node* node)
     get_reduced_dimensions(operand, axis, &shape0, &shape1);
 
     if(scyte_has_gradient(operand)) {
+        #pragma omp parallel for
         for(int i = 0; i < shape0; ++i) {
             int in_base_idx = i*shape1;
             for(int j = 0; j < axis_shape; ++j) {
@@ -90,7 +93,6 @@ void scyte_reduce_mean_backward(scyte_node* node)
                     operand->delta[out_base_idx + k] += s*node->delta[in_base_idx + k];
                 }
             }
-
         }
     }
 }

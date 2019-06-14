@@ -51,6 +51,7 @@ void scyte_dropout_backward(scyte_node* node)
     float dropout_rate = scyte_is_const(operand) || scyte_is_var(operand)? 0.f : *node->children[1]->vals;
     float scale = 1.f / (1.f - dropout_rate);
     if(scyte_has_gradient(operand)) {
+        #pragma omp parallel for schedule(dynamic)
         for(int i = 0; i < n; ++i) {
             if(keep_elements[i]) {
                 operand->delta[i] += scale*node->delta[i];

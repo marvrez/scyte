@@ -28,6 +28,7 @@ void scyte_softmax_forward(scyte_node* node)
     scyte_node* operand = node->children[0];
     int dim = operand->shape[operand->num_dims - 1];
     int batch_size = scyte_num_elements(operand) / dim;
+    #pragma omp parallel for
     for(int i = 0; i < batch_size; ++i) {
         float max = -FLT_MAX, scale = 0.f;
         float* out_vals  = &node->vals[i*dim];
@@ -53,6 +54,7 @@ void scyte_softmax_backward(scyte_node* node)
     int dim = operand->shape[operand->num_dims - 1];
     int batch_size = scyte_num_elements(operand) / dim;
     if(scyte_has_gradient(operand)) {
+        #pragma omp parallel for
         for(int i = 0; i < batch_size; ++i) {
             float* operand_delta = &operand->delta[i*dim];
 

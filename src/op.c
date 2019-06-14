@@ -44,7 +44,8 @@ scyte_node* make_opn_node(scyte_op_type type, int n, scyte_node** x)
 void free_op_node(scyte_node* node)
 {
     free(node->params);
-    free(node->children); free(node);
+    free(node->children);
+    free(node);
 }
 
 char* scyte_get_op_string(scyte_op_type op_type)

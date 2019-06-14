@@ -33,6 +33,7 @@ void scyte_mse_forward(scyte_node* node)
     scyte_node* y = node->children[0], *y_hat = node->children[1];
     int n = scyte_num_elements(y);
     float sse = 0.f; // sum of squared errors
+    #pragma omp parallel for reduction(+:sse)
     for(int i = 0; i < n; ++i) {
         sse += (y->vals[i] - y_hat->vals[i])*(y->vals[i] - y_hat->vals[i]);
     }
@@ -45,6 +46,7 @@ void scyte_mse_backward(scyte_node* node)
     int n = scyte_num_elements(y);
     if(scyte_has_gradient(y_hat)) {
         float s = 2.f * node->delta[0] / n;
+        #pragma omp parallel for
         for(int i = 0; i < n; ++i) {
             y_hat->delta[i] += s*(y->vals[i] - y_hat->vals[i]);
         }

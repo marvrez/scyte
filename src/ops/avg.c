@@ -44,7 +44,10 @@ void scyte_avg_forward(scyte_node* node)
     for(int i = 1; i < node->num_children; ++i) {
         axpy_cpu(n, 1.f, node->children[i]->vals, node->vals);
     }
-    for(int i = 0; i < n; ++i) node->vals[i] *= s;
+    #pragma omp parallel for
+    for(int i = 0; i < n; ++i) {
+        node->vals[i] *= s;
+    }
 }
 
 void scyte_avg_backward(scyte_node* node)
