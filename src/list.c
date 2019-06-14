@@ -1,8 +1,7 @@
 #include "list.h"
 
-#include <stdlib.h>
 #include <string.h>
-#include "list.h"
+#include <stdlib.h>
 
 list* make_list()
 {
