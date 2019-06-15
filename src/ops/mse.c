@@ -35,7 +35,8 @@ void scyte_mse_forward(scyte_node* node)
     float sse = 0.f; // sum of squared errors
     #pragma omp parallel for reduction(+:sse)
     for(int i = 0; i < n; ++i) {
-        sse += (truth->vals[i] - pred->vals[i])*(truth->vals[i] - pred->vals[i]);
+        float diff = truth->vals[i] - pred->vals[i];
+        sse += diff*diff;
     }
     node->vals[0] = sse / (float)n;
 }
