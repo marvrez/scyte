@@ -11,6 +11,10 @@ typedef enum {
     //COST_HUBER,
 } cost_type ;
 
+// Generates a network from a computational graph.
+// A network must have at least one scalar cost node (i.e. whose num_dims==0).
+scyte_network scyte_make_network(scyte_node* cost_node);
+
 scyte_node* scyte_layer_input(int num_input);
 scyte_node* scyte_layer_dense(scyte_node* in, int num_units);
 scyte_node* scyte_layer_dropout(scyte_node* in, float dropout_rate);

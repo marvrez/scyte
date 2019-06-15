@@ -21,10 +21,13 @@ static inline scyte_node* scyte_make_node(scyte_node_type type, unsigned num_dim
     if(type != INPUT) {
         int num_elements = scyte_num_elements(node);
         node->vals = (float*)calloc(num_elements, sizeof(float));
-        if (node->num_dims <= 1) set_cpu(num_elements, fill_val, node->vals);
+        if(node->num_dims <= 1) set_cpu(num_elements, fill_val, node->vals);
         else {
             float s = 2.f / sqrtf((float)num_elements / node->shape[0]); // s = 2 / sqrt(n_in)
-            for(int i = 0; i < num_elements; ++i) node->vals[i] = s*random_uniform(-1, 1);
+            #pragma omp parallel for
+            for(int i = 0; i < num_elements; ++i) {
+                node->vals[i] = s*random_uniform(-1, 1);
+            }
         }
     }
     return node;
@@ -48,9 +51,9 @@ scyte_node* scyte_var(unsigned num_dims, int shape[SCYTE_MAX_DIMS], float fill_v
 static inline void scyte_propagate_gradient_marks(int n, scyte_node** nodes)
 {
     for(int i = 0; i < n; ++i) {
+        int j;
         scyte_node* node = nodes[i];
         if(node->num_children == 0) continue;
-        int j;
         for(j = 0; j < node->num_children; ++j) {
             if(scyte_has_gradient(node->children[j])) {
                 break;
@@ -67,9 +70,10 @@ static void scyte_allocate_tensors(int n, scyte_node** nodes)
     for(int i = 0; i < n; ++i) {
         scyte_node* node = nodes[i];
         if(node->num_children == 0) continue;
-        node->vals = (float*)realloc(node->vals, scyte_num_elements(node)*sizeof(float));
+        int num_elements = scyte_num_elements(node);
+        node->vals = (float*)realloc(node->vals, num_elements*sizeof(float));
         if(scyte_has_gradient(node)) {
-            node->delta = (float*)realloc(node->delta, scyte_num_elements(node)*sizeof(float));
+            node->delta = (float*)realloc(node->delta, num_elements*sizeof(float));
         }
     }
 }
@@ -118,7 +122,7 @@ scyte_node** scyte_make_graph(int* num_nodes, int num_roots, scyte_node** roots)
     while(n) {
         scyte_node* node = n->data;
         if(node->mark >> 1 != 0) {
-            LOG_ERROR("detected cycle in the computational graph");
+            LOG_ERROR("detected a cycle in the computational graph");
             assert(0);
         }
         node->mark = 0x0;
@@ -201,7 +205,7 @@ void scyte_backward(int n, scyte_node** nodes, int from)
     nodes[from]->delta[0] = 1.f; // derivative of output w.r.t output is 1
     for(i = from; i >= 0; --i) {
         scyte_node* node = nodes[i];
-        if (node->num_children > 0 && node->mark > 0) {
+        if(node->num_children > 0 && node->mark > 0) {
             node->backward(node);
         }
     }
@@ -239,7 +243,67 @@ void scyte_print_graph(int n, scyte_node** nodes)
     for(i = 0; i < n; ++i) nodes[i]->mark = 0;
 }
 
+static inline void scyte_save_node(FILE* fp, scyte_node* node)
+{
+    fwrite(&node->type, sizeof(scyte_node_type), 1, fp);
+    fwrite(&node->num_children, sizeof(int), 1, fp);
+    if(node->num_children > 0) {
+        fwrite(&node->op_type, sizeof(scyte_op_type), 1, fp);
+        for(int j = 0; j < node->num_children; ++j) {
+            fwrite(&node->children[j]->mark, sizeof(int), 1, fp);
+        }
+        fwrite(&node->params_size, sizeof(size_t), 1, fp);
+        if(node->params_size > 0 && node->params) {
+            fwrite(node->params, node->params_size, 1, fp);
+        }
+    }
+    fwrite(&node->num_dims, sizeof(unsigned), 1, fp);
+    if(node->num_dims > 0) fwrite(node->shape, sizeof(int), node->num_dims, fp);
+}
+
 void scyte_save_graph(FILE* fp, int num_nodes, scyte_node** nodes)
 {
-    // TODO
+    fwrite(&num_nodes, sizeof(int), 1, fp);
+    for(int i = 0; i < num_nodes; ++i) nodes[i]->mark = i;
+    for(int i = 0; i < num_nodes; ++i) scyte_save_node(fp, nodes[i]);
+    for(int i = 0; i < num_nodes; ++i) nodes[i]->mark = 0;
+}
+
+static inline scyte_node* scyte_load_node(FILE* fp, scyte_node** graph)
+{
+    scyte_node* node = (scyte_node*)calloc(1, sizeof(scyte_node));
+    fread(&node->type, sizeof(scyte_node_type), 1, fp);
+    fread(&node->num_children, sizeof(int), 1, fp);
+    if(node->num_children > 0) {
+        int child_idx;
+        node->children = (scyte_node**)calloc(node->num_children, sizeof(scyte_node*));
+        fread(&node->op_type, sizeof(scyte_op_type), 1, fp);
+        for(int j = 0; j < node->num_children; ++j) {
+            fread(&child_idx, sizeof(int), 1, fp);
+            node->children[j] = graph != NULL ? graph[child_idx] : 0;
+        }
+        fread(&node->params_size, sizeof(size_t), 1, fp);
+        if(node->params_size > 0) {
+            node->params = malloc(node->params_size);
+            fread(node->params, node->params_size, 1, fp);
+        }
+    }
+    fread(&node->num_dims, sizeof(unsigned), 1, fp);
+    if(node->num_dims > 0) fread(node->shape, sizeof(int), node->num_dims, fp);
+    return node;
+}
+
+scyte_node** scyte_load_graph(FILE* fp, int* n)
+{
+    int num_nodes;
+    scyte_node** graph;
+
+    fread(&num_nodes, sizeof(int), 1, fp);
+    graph = (scyte_node**)calloc(num_nodes, sizeof(scyte_node*));
+    for(int i = 0; i < num_nodes; ++i) {
+        graph[i] = scyte_load_node(fp, graph);
+    }
+    *n = num_nodes;
+    scyte_propagate_gradient_marks(num_nodes, graph);
+    return graph;
 }

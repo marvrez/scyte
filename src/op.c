@@ -21,7 +21,7 @@ scyte_node* make_op1_node(scyte_op_type type, scyte_node* x)
 {
     scyte_node* node = make_op_node(type, 0, 1);
     node->children[0] = x;
-    scyte_validate_node(node);
+    scyte_propagate_gradient_mark(node);
     return node;
 }
 
@@ -29,7 +29,7 @@ scyte_node* make_op2_node(scyte_op_type type, scyte_node* x, scyte_node* y)
 {
     scyte_node* node = make_op_node(type, 0, 2);
     node->children[0] = x, node->children[1] = y;
-    scyte_validate_node(node);
+    scyte_propagate_gradient_mark(node);
     return node;
 }
 
@@ -37,7 +37,7 @@ scyte_node* make_opn_node(scyte_op_type type, int n, scyte_node** x)
 {
     scyte_node* node = make_op_node(type, 0, n);
     for(int i = 0; i < n; ++i) node->children[i] = x[i];
-    scyte_validate_node(node);
+    scyte_propagate_gradient_mark(node);
     return node;
 }
 
@@ -123,7 +123,7 @@ void get_reduced_dimensions(scyte_node* node, int axis, int* shape0, int* shape1
     for(int i = axis + 1; i < node->num_dims; ++i) *shape1 *= node->shape[i];
 }
 
-void scyte_validate_node(scyte_node* node)
+void scyte_propagate_gradient_mark(scyte_node* node)
 {
     for(int i = 0; i < node->num_children; ++i) {
         if(scyte_has_gradient(node->children[i])) {

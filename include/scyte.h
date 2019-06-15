@@ -19,7 +19,8 @@ typedef unsigned char scyte_node_type;
 #define scyte_is_input(p)       (scyte_is_operand(p) && !scyte_has_gradient(p) && !((p)->type & CONST))
 
 typedef enum {
-    ADD = 0,
+    NOOP = 0,
+    ADD,
     SUB,
     MULTIPLY,
     SQUARE,

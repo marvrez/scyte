@@ -45,6 +45,6 @@ scyte_op_type scyte_get_op_type(char* s);
 void get_reduced_dimensions(scyte_node* node, int axis, int* shape0, int* shape1);
 
 // checks if gradients can flow through the op-node, if so set type to VAR
-void scyte_validate_node(scyte_node* node);
+void scyte_propagate_gradient_mark(scyte_node* node);
 
 #endif
