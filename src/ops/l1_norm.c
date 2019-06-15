@@ -1,8 +1,10 @@
-#include "ops/mse.h"
+#include "ops/l1_norm.h"
 
 #include "op.h"
 #include "logger.h"
+#include "utils.h"
 
+#include <math.h>
 #include <stdio.h>
 
 static inline int sync_dims(scyte_node* node)
@@ -17,10 +19,10 @@ static inline int sync_dims(scyte_node* node)
     return 1;
 }
 
-scyte_node* scyte_mse(scyte_node* truth, scyte_node* pred)
+scyte_node* scyte_l1_norm(scyte_node* truth, scyte_node* pred)
 {
-    scyte_node* node = make_op2_node(MSE, truth, pred);
-    node->forward = scyte_mse_forward, node->backward = scyte_mse_backward;
+    scyte_node* node = make_op2_node(L1_NORM, truth, pred);
+    node->forward = scyte_l1_norm_forward, node->backward = scyte_l1_norm_backward;
     if(!sync_dims(node)) {
         free_op_node(node);
         return NULL;
@@ -28,27 +30,27 @@ scyte_node* scyte_mse(scyte_node* truth, scyte_node* pred)
     return node;
 }
 
-void scyte_mse_forward(scyte_node* node)
+void scyte_l1_norm_forward(scyte_node* node)
 {
     scyte_node* truth = node->children[0], *pred = node->children[1];
     int n = scyte_num_elements(truth);
-    float sse = 0.f; // sum of squared errors
-    #pragma omp parallel for reduction(+:sse)
+    float abs_diffs = 0.f; // sum of absolute differences
+    #pragma omp parallel for reduction(+:abs_diffs)
     for(int i = 0; i < n; ++i) {
-        sse += (truth->vals[i] - pred->vals[i])*(truth->vals[i] - pred->vals[i]);
+        abs_diffs += fabsf(truth->vals[i] - pred->vals[i]);
     }
-    node->vals[0] = sse / (float)n;
+    node->vals[0] = abs_diffs / (float)n;
 }
 
-void scyte_mse_backward(scyte_node* node)
+void scyte_l1_norm_backward(scyte_node* node)
 {
     scyte_node* truth = node->children[0], *pred = node->children[1];
     int n = scyte_num_elements(truth);
     if(scyte_has_gradient(pred)) {
-        float s = 2.f * node->delta[0] / n;
+        float s = node->delta[0] / n;
         #pragma omp parallel for
         for(int i = 0; i < n; ++i) {
-            pred->delta[i] += s*(truth->vals[i] - pred->vals[i]);
+            pred->delta[i] += s*get_sign(truth->vals[i] - pred->vals[i]);
         }
     }
 }

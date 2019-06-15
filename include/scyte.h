@@ -37,6 +37,7 @@ typedef enum {
     LOG,
     SIN,
     MSE,
+    L1_NORM,
     LOGXENT,
     CATEGORICALXENT,
     REDUCE_MEAN,
@@ -93,7 +94,7 @@ void scyte_backward(int n, scyte_node** nodes, int from);
 
 void scyte_print_graph(int n, scyte_node** nodes);
 void scyte_save_graph(FILE* fp, int num_nodes, scyte_node** nodes);
-scyte_node** scyte_load_graph(FILE* fp, int* num_nodes);
+scyte_node** scyte_load_graph(FILE* fp, int* n);
 
 static inline int scyte_num_elements(scyte_node* node)
 {

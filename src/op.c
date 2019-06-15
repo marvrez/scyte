@@ -77,6 +77,7 @@ char* scyte_get_op_string(scyte_op_type op_type)
         case REDUCE_MEAN: return "reduce_mean";
         case CATEGORICALXENT: return "categoricalxent";
         case LOGXENT: return "logxent";
+        case L1_NORM: return "l1_norm";
         case NOP: default: break;
     }
     return "unknown";
@@ -110,6 +111,7 @@ scyte_op_type scyte_get_op_type(char* s)
     if(strcmp(s, "reduce_mean")) return REDUCE_MEAN;
     if(strcmp(s, "categoricalxent")) return CATEGORICALXENT;
     if(strcmp(s, "logxent")) return LOGXENT;
+    if(strcmp(s, "l1_norm")) return L1_NORM;
     LOG_ERRORF("couldn't find operation %s", s);
     return NOP;
 }

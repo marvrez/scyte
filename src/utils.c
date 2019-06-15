@@ -51,6 +51,11 @@ float random_uniform(float min, float max)
     return ((float)rand()/RAND_MAX * (max - min)) + min;
 }
 
+int get_sign(float val)
+{
+    return (val > 0) - (val < 0);
+}
+
 char* get_shape_string(int n, int* shape)
 {
     int i;
