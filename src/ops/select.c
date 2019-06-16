@@ -37,8 +37,8 @@ static inline int sync_dims(scyte_node* node)
         scyte_node* child = node->children[i];
         int num_elements_children = scyte_num_elements(child);
         if(child->num_dims != chosen_node->num_dims || num_elements_children != n) {
-            LOG_ERRORF("dimensions %d != %d for child %d was not properly synced, returning NULL\n",
-                i, n, num_elements_children);
+            LOG_ERRORF("nun_elements (%d != %d) or num_dims (%d != %d) for child %d was not properly synced, returning NULL\n",
+                n, num_elements_children, child->num_dims, chosen_node->num_dims, i);
             return 0;
         }
     }
@@ -46,7 +46,7 @@ static inline int sync_dims(scyte_node* node)
     return 1;
 }
 
-scyte_node* scyte_select(int n, scyte_node** nodes, int node_idx)
+scyte_node* scyte_select(int node_idx, int n, scyte_node** nodes)
 {
     scyte_node* node = make_opn_node(SELECT, n, nodes);
     set_node_idx(node, node_idx);
@@ -55,12 +55,13 @@ scyte_node* scyte_select(int n, scyte_node** nodes, int node_idx)
         free_op_node(node);
         return NULL;
     }
+    fprintf(stderr, "select         idx=%d\n", node_idx);
     return node;
 }
 
 scyte_node* scyte_dynamic_select(int n, scyte_node** nodes)
 {
-    scyte_node* node = scyte_select(n, nodes, 0);
+    scyte_node* node = scyte_select(0, n, nodes);
     return node;
 }
 

@@ -22,7 +22,7 @@ static inline int sync_dims(scyte_node* node)
     return 1;
 }
 
-scyte_node* scyte_logistic_x_entropy(scyte_node* pred, scyte_node* truth)
+scyte_node* scyte_logistic_x_entropy(scyte_node* truth, scyte_node* pred)
 {
     scyte_node* node = make_op2_node(LOGXENT, pred, truth);
     node->forward = scyte_logistic_x_entropy_forward, node->backward = scyte_logistic_x_entropy_backward;

@@ -3,6 +3,7 @@
 #include "op.h"
 #include "logger.h"
 #include "blas.h"
+#include "utils.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -48,6 +49,10 @@ scyte_node* scyte_reduce_sum(scyte_node* node, int axis)
         free_op_node(out);
         return NULL;
     }
+    fprintf(stderr, "reduce_sum     axis=%d               %s -> %s\n", 
+            axis, 
+            get_shape_string(node->num_dims, node->shape), 
+            get_shape_string(out->num_dims, out->shape));
     return out;
 }
 

@@ -19,6 +19,7 @@ scyte_node* scyte_tanh(scyte_node* x)
         free_op_node(node);
         return NULL;
     }
+    fprintf(stderr, "tanh                             %4d\n", scyte_num_elements(x));
     return node;
 }
 

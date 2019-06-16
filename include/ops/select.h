@@ -4,7 +4,7 @@
 #include "scyte.h"
 
 // select node by node index
-scyte_node* scyte_select(int n, scyte_node** nodes, int node_idx);
+scyte_node* scyte_select(int node_idx, int n, scyte_node** nodes);
 // utility to switch between two nodes during runtime
 scyte_node* scyte_dynamic_select(int n, scyte_node** nodes);
 

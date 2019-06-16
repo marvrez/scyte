@@ -2,6 +2,9 @@
 
 #include "blas.h"
 #include "op.h"
+#include "utils.h"
+
+#include <stdio.h>
 
 static inline int sync_dims(scyte_node* node)
 {
@@ -17,6 +20,7 @@ scyte_node* scyte_relu(scyte_node* x)
         free_op_node(node);
         return NULL;
     }
+    fprintf(stderr, "relu                             %4d\n", scyte_num_elements(x));
     return node;
 }
 

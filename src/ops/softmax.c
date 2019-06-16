@@ -20,6 +20,7 @@ scyte_node* scyte_softmax(scyte_node* x)
         free_op_node(node);
         return NULL;
     }
+    fprintf(stderr, "softmax                          %4d\n", scyte_num_elements(x));
     return node;
 }
 

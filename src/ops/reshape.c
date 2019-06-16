@@ -69,6 +69,9 @@ scyte_node* scyte_reshape(scyte_node* x, int n, int* shape)
         free_op_node(node);
         return NULL;
     }
+    fprintf(stderr, "reshape                             %s -> %s\n", 
+            get_shape_string(x->num_dims, x->shape),
+            get_shape_string(node->num_dims, node->shape));
     return node;
 }
 

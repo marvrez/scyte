@@ -2,6 +2,8 @@
 
 #include "op.h"
 #include "blas.h"
+#include "logger.h"
+#include "utils.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,9 +29,17 @@ static inline int sync_dims(scyte_node* node, int axis)
 {
     scyte_node* input = node->children[0];
     for(int i = 1; i < node->num_children; ++i) {
-        if(node->children[i]->num_dims != input->num_dims) return 0;
+        if(node->children[i]->num_dims != input->num_dims) {
+            LOG_ERRORF("child %d and input doesn't have same num_dims (%d != %d)",
+                    i, node->children[i]->num_dims, input->num_dims);
+            return 0;
+        }
         for(int j = 0; j < input->num_dims; ++j) {
-            if (j != axis && input->shape[j] != node->children[i]->shape[j]) return 0;
+            if (j != axis && input->shape[j] != node->children[i]->shape[j]){
+                LOG_ERRORF("child %d and input doesn't have same dims (%d != %d)",
+                        i, node->children[i]->shape[j], input->shape[j]);
+                return 0;
+            }
         }
     }
     scyte_copy_shape(input, node);
@@ -46,6 +56,10 @@ scyte_node* scyte_concat(int axis, int n, scyte_node** x)
         free_op_node(node);
         return NULL;
     }
+    fprintf(stderr, "concat         axis=%d               %s -> %s\n",
+            axis, 
+            get_shape_string(x[0]->num_dims, x[0]->shape),
+            get_shape_string(node->num_dims, node->shape));
     return node;
 }
 

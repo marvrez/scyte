@@ -19,6 +19,7 @@ scyte_node* scyte_sigmoid(scyte_node* x)
         free_op_node(node);
         return NULL;
     }
+    fprintf(stderr, "sigmoid                          %4d\n", scyte_num_elements(x));
     return node;
 }
 
