@@ -10,6 +10,10 @@ typedef unsigned char scyte_node_type;
 #define PLACEHOLDER     0x1
 #define VAR             0x2
 #define CONST           0x4
+#define INPUT           0x8
+#define OUTPUT          0x10
+#define GROUND_TRUTH    0x20
+#define COST            0x40
 
 #define scyte_has_gradient(p)   ((p)->type & VAR)
 
