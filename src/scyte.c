@@ -18,7 +18,7 @@ static inline scyte_node* scyte_make_node(scyte_node_type type, unsigned num_dim
     node = (scyte_node*)calloc(1, sizeof(scyte_node));
     node->num_dims = num_dims, node->type = type;
     memcpy(node->shape, shape, num_dims*sizeof(int));
-    if(type != INPUT) {
+    if(type != PLACEHOLDER) {
         int num_elements = scyte_num_elements(node);
         node->vals = (float*)calloc(num_elements, sizeof(float));
         if(node->num_dims <= 1) set_cpu(num_elements, fill_val, node->vals);
@@ -33,9 +33,9 @@ static inline scyte_node* scyte_make_node(scyte_node_type type, unsigned num_dim
     return node;
 }
 
-scyte_node* scyte_input(unsigned num_dims, int shape[SCYTE_MAX_DIMS])
+scyte_node* scyte_placeholder(unsigned num_dims, int shape[SCYTE_MAX_DIMS])
 {
-    return scyte_make_node(INPUT, num_dims, shape, 0);
+    return scyte_make_node(PLACEHOLDER, num_dims, shape, 0);
 }
 
 scyte_node* scyte_const(unsigned num_dims, int shape[SCYTE_MAX_DIMS], float fill_val)
@@ -46,6 +46,24 @@ scyte_node* scyte_const(unsigned num_dims, int shape[SCYTE_MAX_DIMS], float fill
 scyte_node* scyte_var(unsigned num_dims, int shape[SCYTE_MAX_DIMS], float fill_val)
 {
     return scyte_make_node(VAR, num_dims, shape, fill_val);
+}
+
+scyte_node* scyte_scalar(scyte_node_type type, float val)
+{
+    static int shape[] = {};
+    return scyte_make_node(type, 0, shape, val);
+}
+
+scyte_node* scyte_bias(int n, float default_val)
+{
+    int shape[] = { n };
+    return scyte_var(1, shape, default_val);
+}
+
+scyte_node* scyte_weight(int rows, int cols)
+{
+    int shape[] = {rows, cols};
+    return scyte_var(2, shape, 0.f);
 }
 
 static inline void scyte_propagate_gradient_marks(int n, scyte_node** nodes)
@@ -155,6 +173,15 @@ void scyte_copy_shape(const scyte_node* src, scyte_node* dst)
     }
 }
 
+void scyte_fill_vals(scyte_node* node, float fill_val)
+{
+    int n = scyte_num_elements(node);
+    #pragma omp parallel for
+    for(int i = 0; i < n; ++i) {
+        node->vals[i] = fill_val;
+    }
+}
+
 static inline void scyte_propagate_marks(int n, scyte_node** nodes)
 {
     for(int i = n-1; i>= 0; --i) {
@@ -236,7 +263,7 @@ void scyte_print_graph(int n, scyte_node** nodes)
             printf(")");
         }
         else printf("%s", scyte_is_var(node) ? "var" : scyte_is_const(node) ? "const"
-                        : scyte_is_input(node) ? "input" : "N/A");
+                        : scyte_is_placeholder(node) ? "placeholder" : "N/A");
         putchar('\n');
     }
     printf("----------------------------\n");

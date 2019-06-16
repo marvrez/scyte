@@ -7,16 +7,16 @@
 
 typedef unsigned char scyte_node_type;
 
-#define INPUT   0x1
-#define VAR     0x2
-#define CONST   0x4
+#define PLACEHOLDER     0x1
+#define VAR             0x2
+#define CONST           0x4
 
-#define scyte_has_gradient(p)  ((p)->type & VAR)
+#define scyte_has_gradient(p)   ((p)->type & VAR)
 
 #define scyte_is_operand(p)     ((p)->num_children == 0)
 #define scyte_is_var(p)         (scyte_is_operand(p) && scyte_has_gradient(p))
 #define scyte_is_const(p)       (scyte_is_operand(p) && ((p)->type & CONST))
-#define scyte_is_input(p)       (scyte_is_operand(p) && !scyte_has_gradient(p) && !((p)->type & CONST))
+#define scyte_is_placeholder(p) (scyte_is_operand(p) && !scyte_has_gradient(p) && !((p)->type & CONST))
 
 typedef enum {
     NOOP = 0,
@@ -78,16 +78,18 @@ typedef struct {
     scyte_node** nodes; // array of the nodes in the network
 } scyte_network;
 
-// node->vals are set to fill_val if num_dims <=  1
-scyte_node* scyte_input(unsigned num_dims, int shape[SCYTE_MAX_DIMS]);
-scyte_node* scyte_const(unsigned num_dims, int shape[SCYTE_MAX_DIMS], float fill_val);
-scyte_node* scyte_var(unsigned num_dims, int shape[SCYTE_MAX_DIMS], float fill_val);
+// node->vals are set to fill_val if num_dims <= 1
+scyte_node* scyte_placeholder(unsigned num_dims, int shape[SCYTE_MAX_DIMS]);
+scyte_node* scyte_scalar(scyte_node_type type, float val);
+scyte_node* scyte_bias(int n, float default_val);
+scyte_node* scyte_weight(int rows, int cols);
 
 scyte_node** scyte_make_graph(int* num_nodes, int num_roots, scyte_node** roots);
 void scyte_free_graph(int n, scyte_node** nodes);
 scyte_node** scyte_copy_graph(int n, scyte_node** nodes, int batch_size);
 
 void scyte_copy_shape(const scyte_node* src, scyte_node* dst);
+void scyte_fill_vals(scyte_node* node, float fill_val);
 
 // returns a pointer to nodes[to]->vals, so be careful to not free the data!
 const float* scyte_forward(int n, scyte_node** nodes, int to);
