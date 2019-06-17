@@ -24,7 +24,6 @@ static inline scyte_node* scyte_make_node(scyte_node_type type, unsigned num_dim
         if(node->num_dims <= 1) set_cpu(num_elements, fill_val, node->vals);
         else {
             float s = 2.f / sqrtf((float)num_elements / node->shape[0]); // s = 2 / sqrt(n_in)
-            #pragma omp parallel for
             for(int i = 0; i < num_elements; ++i) {
                 node->vals[i] = s*random_uniform(-1, 1);
             }
@@ -64,6 +63,25 @@ scyte_node* scyte_weight(int rows, int cols)
 {
     int shape[] = {rows, cols};
     return scyte_var(2, shape, 0.f);
+}
+
+int scyte_feed_net(scyte_network* net, scyte_node_type type, float** vals)
+{
+    int num_matches = 0;
+    if(vals == NULL) return 0;
+    for(int i = 0; i < net->n; ++i) {
+        scyte_node* node = net->nodes[i];
+        if(scyte_is_placeholder(node) && (type == 0 || node->type & type)) {
+            node->vals = vals[num_matches++];
+        }
+    }
+    return num_matches;
+}
+
+void scyte_feed_placeholder(scyte_node* node, float* vals)
+{
+    if(!scyte_is_placeholder(node)) return;
+    node->vals = vals;
 }
 
 static inline void scyte_propagate_gradient_marks(int n, scyte_node** nodes)
