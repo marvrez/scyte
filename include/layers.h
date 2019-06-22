@@ -9,16 +9,22 @@ typedef enum {
     COST_L1,
     COST_L2,
     //COST_HUBER,
-} cost_type ;
+} cost_type;
+
+const char* get_cost_string(cost_type type);
 
 // Generates a network from a computational graph.
 // A network must have at least one scalar cost node (i.e. whose num_dims==0).
-scyte_network scyte_make_network(scyte_node* cost_node);
+scyte_network* scyte_make_network(scyte_node* cost_node);
+void scyte_free_network(scyte_network* net);
 
-scyte_node* scyte_layer_input(int num_input);
-scyte_node* scyte_layer_dense(scyte_node* in, int num_units);
+void scyte_save_network(const char* filename, scyte_network* net);
+scyte_network* scyte_load_network(const char* filename);
+
+scyte_node* scyte_layer_input(int n);
+scyte_node* scyte_layer_connected(scyte_node* in, int num_outputs);
 scyte_node* scyte_layer_dropout(scyte_node* in, float dropout_rate);
 scyte_node* scyte_layer_layernorm(scyte_node* in);
-scyte_node* scyte_layer_cost(scyte_node* t, int num_out, cost_type type);
+scyte_node* scyte_layer_cost(scyte_node* in, int num_out, cost_type type);
 
 #endif
