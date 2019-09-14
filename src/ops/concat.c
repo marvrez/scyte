@@ -56,10 +56,16 @@ scyte_node* scyte_concat(int axis, int n, scyte_node** x)
         free_op_node(node);
         return NULL;
     }
+    char* input_shape = get_shape_string(x[0]->num_dims, x[0]->shape);
+    char* output_shape = get_shape_string(node->num_dims, node->shape);
     fprintf(stderr, "concat         axis=%d               %s -> %s\n",
             axis, 
-            get_shape_string(x[0]->num_dims, x[0]->shape),
-            get_shape_string(node->num_dims, node->shape));
+            input_shape,
+            output_shape
+    );
+    free(input_shape);
+    free(output_shape);
+            
     return node;
 }
 

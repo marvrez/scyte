@@ -51,10 +51,15 @@ scyte_node* scyte_layer_layernorm(scyte_node* in)
 {
 
     int dim = in->num_dims >= 2 ? 
-        scyte_num_elements(in) / in->shape[0] : scyte_num_elements(in);
-    fprintf(stderr, "layer_norm                       %s\n", get_shape_string(in->num_dims, in->shape));
+            scyte_num_elements(in) / in->shape[0] : scyte_num_elements(in);
+    char* shape_str = get_shape_string(in->num_dims, in->shape);
+    fprintf(stderr, "layer_norm                          %s\n", shape_str);
+
     scyte_node* alpha = scyte_bias(dim, 1.f);
     scyte_node* beta  = scyte_bias(dim, 0.f);
+
+    free(shape_str);
+
     return scyte_add(scyte_mul(scyte_normalize(in), alpha), beta);
 }
 

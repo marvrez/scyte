@@ -61,7 +61,7 @@ char* get_shape_string(int n, int* shape)
     int i;
     if(shape == NULL || n <= 0) return NULL;
     for(i = 0; i < n && shape[i] <= 0; ++i) {}
-	char* ret = malloc(256*sizeof(char)), tmp[32];
+    char* ret = malloc(256*sizeof(char)), tmp[32];
     sprintf(tmp, "(%d", shape[i++]);
     strcat(ret, tmp);
     for(; i < n; ++i) {

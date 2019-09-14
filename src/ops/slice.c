@@ -45,10 +45,13 @@ scyte_node* scyte_slice(scyte_node* x, int axis, int start, int size)
         free_op_node(node);
         return NULL;
     }
+    char* input_shape = get_shape_string(x->num_dims, x->shape);
+    char* output_shape = get_shape_string(node->num_dims, node->shape);
     fprintf(stderr, "slice      axis=%d,start=%d,size=%d    %s -> %s\n", 
-            axis, start, size,
-            get_shape_string(x->num_dims, x->shape),
-            get_shape_string(node->num_dims, node->shape));
+            axis, start, size, input_shape, output_shape);
+    free(input_shape);
+    free(output_shape);
+            
     return node;
 }
 

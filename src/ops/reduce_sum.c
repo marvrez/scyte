@@ -49,10 +49,16 @@ scyte_node* scyte_reduce_sum(scyte_node* node, int axis)
         free_op_node(out);
         return NULL;
     }
+    char* input_shape = get_shape_string(node->num_dims, node->shape);
+    char* output_shape = get_shape_string(out->num_dims, out->shape);
     fprintf(stderr, "reduce_sum     axis=%d               %s -> %s\n", 
             axis, 
-            get_shape_string(node->num_dims, node->shape), 
-            get_shape_string(out->num_dims, out->shape));
+            input_shape,
+            output_shape
+    );
+    free(input_shape);
+    free(ouput_shape);
+            
     return out;
 }
 
