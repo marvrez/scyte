@@ -18,6 +18,15 @@ const char* get_cost_string(cost_type type)
     return "unknown";
 }
 
+
+void scyte_free_network(scyte_network* net)
+{
+    if(!net) return;
+    free(net->vals); free(net->deltas); free(net->consts);
+    scyte_free_graph(net->n, net->nodes);
+    free(net);
+}
+
 scyte_node* scyte_layer_input(int n)
 {
     int shape[] = {1, n};

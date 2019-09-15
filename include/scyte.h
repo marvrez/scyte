@@ -80,6 +80,9 @@ typedef struct scyte_node {
 typedef struct {
     int n;              // number of nodes in the network
     scyte_node** nodes; // array of the nodes in the network
+    float* vals;    // collated values
+    float* deltas;  // collated deltas
+    float* consts;  // collated constants
 } scyte_network;
 
 // node->vals are set to fill_val if num_dims <= 1

@@ -57,7 +57,7 @@ scyte_node* scyte_reduce_sum(scyte_node* node, int axis)
             output_shape
     );
     free(input_shape);
-    free(ouput_shape);
+    free(output_shape);
             
     return out;
 }
