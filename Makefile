@@ -40,13 +40,12 @@ LDFLAGS+= `pkg-config --libs opencv`
 COMMON+= `pkg-config --cflags opencv`
 endif
 
-EXECOBJS = $(addprefix $(OBJDIR), $(EXECOBJA))
 OBJS   = $(addprefix $(OBJDIR), $(OBJ))
 DEPS   = $(wildcard include/*.h) Makefile
 
 all: obj $(EXEC)
 
-$(EXEC): $(OBJS) $(EXECOBJS)
+$(EXEC): $(OBJS)
 	$(CC) $(COMMON) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 $(OBJDIR)%.o: %.c $(DEPS)

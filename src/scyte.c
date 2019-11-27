@@ -23,9 +23,10 @@ static inline scyte_node* scyte_make_node(scyte_node_type type, unsigned num_dim
         node->vals = (float*)calloc(num_elements, sizeof(float));
         if(node->num_dims <= 1) set_cpu(num_elements, fill_val, node->vals);
         else {
-            float s = 2.f / sqrtf((float)num_elements / node->shape[0]); // s = 2 / sqrt(n_in)
+            int num_in = num_elements / node->shape[0];
+            float scale = sqrtf(2.f / num_in); // s = sqrt(2 / n_in)
             for(int i = 0; i < num_elements; ++i) {
-                node->vals[i] = s*random_uniform(-1, 1);
+                node->vals[i] = scale*random_uniform(-1, 1);
             }
         }
     }
