@@ -5,7 +5,6 @@
 #include "utils.h"
 
 #include <stdio.h>
-#include <assert.h>
 
 const char* get_cost_string(cost_type type)
 {
@@ -16,15 +15,6 @@ const char* get_cost_string(cost_type type)
         case COST_L2: return "L2";
     }
     return "unknown";
-}
-
-
-void scyte_free_network(scyte_network* net)
-{
-    if(!net) return;
-    free(net->vals); free(net->deltas); free(net->consts);
-    scyte_free_graph(net->n, net->nodes);
-    free(net);
 }
 
 scyte_node* scyte_layer_input(int n)
@@ -59,7 +49,7 @@ scyte_node* scyte_layer_dropout(scyte_node* in, float dropout_rate)
 scyte_node* scyte_layer_layernorm(scyte_node* in)
 {
 
-    int dim = in->num_dims >= 2 ? 
+    int dim = in->num_dims >= 2 ?
             scyte_num_elements(in) / in->shape[0] : scyte_num_elements(in);
     char* shape_str = get_shape_string(in->num_dims, in->shape);
     fprintf(stderr, "layer_norm                          %s\n", shape_str);
