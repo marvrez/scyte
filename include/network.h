@@ -11,7 +11,7 @@ scyte_network* scyte_make_network(scyte_node* cost_node);
 void scyte_free_network(scyte_network* net);
 
 void scyte_train_network(scyte_network* net, scyte_optimizer_params params, int batch_size, int epochs, int n, float** x, float** y );
-float* scyte_predict_network(scyte_network* net, float* data);
+const float* scyte_predict_network(scyte_network* net, float* data);
 
 void scyte_save_network(const char* filename, scyte_network* net);
 scyte_network* scyte_load_network(const char* filename);

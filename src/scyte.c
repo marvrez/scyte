@@ -66,6 +66,18 @@ scyte_node* scyte_weight(int rows, int cols)
     return scyte_var(2, shape, 0.f);
 }
 
+int scyte_find_node(scyte_network* net, scyte_node_type type)
+{
+    int idx = -1, num_matches = 0;
+    for(int i = 0; i < net->n; ++i) {
+        scyte_node* node = net->nodes[i];
+        if(node->type & type) {
+            idx = i, num_matches++;
+        }
+    }
+    return num_matches == 0 ? idx : num_matches == 0 ? -1 : -2;
+}
+
 int scyte_feed_net(scyte_network* net, scyte_node_type type, float** vals)
 {
     int num_matches = 0;

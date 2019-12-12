@@ -91,6 +91,9 @@ scyte_node* scyte_scalar(scyte_node_type type, float val);
 scyte_node* scyte_bias(int n, float default_val);
 scyte_node* scyte_weight(int rows, int cols);
 
+
+// find index of node with certain type
+int scyte_find_node(scyte_network* net, scyte_node_type type);
 // feed placeholders in a net of a certain type with given vals
 int scyte_feed_net(scyte_network* net, scyte_node_type type, float** vals);
 // feed a single placeholder
@@ -103,7 +106,7 @@ scyte_node** scyte_copy_graph(int n, scyte_node** nodes, int batch_size);
 void scyte_copy_shape(const scyte_node* src, scyte_node* dst);
 void scyte_fill_vals(scyte_node* node, float fill_val);
 
-// returns a pointer to nodes[to]->vals, so be careful to not free the data!
+// returns a pointer to nodes[to]->vals
 const float* scyte_forward(int n, scyte_node** nodes, int to);
 void scyte_backward(int n, scyte_node** nodes, int from);
 
