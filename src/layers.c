@@ -69,7 +69,7 @@ scyte_node* scyte_layer_cost(scyte_node* in, int num_out, cost_type type)
     int out_shape[] = {1, num_out};
     scyte_node* truth = scyte_placeholder(2, out_shape);
 
-    scyte_node* cost;
+    scyte_node* cost = NULL;
     switch(type) {
         case COST_BINARY_CROSS_ENTROPY:
             pred = scyte_sigmoid(pred);
