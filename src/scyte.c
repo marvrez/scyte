@@ -75,7 +75,7 @@ int scyte_find_node(scyte_network* net, scyte_node_type type)
             idx = i, num_matches++;
         }
     }
-    return num_matches == 0 ? idx : num_matches == 0 ? -1 : -2;
+    return num_matches == 1 ? idx : num_matches == 0 ? -1 : -2;
 }
 
 int scyte_feed_net(scyte_network* net, scyte_node_type type, float** vals)
