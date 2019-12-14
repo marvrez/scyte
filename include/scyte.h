@@ -21,6 +21,8 @@ typedef unsigned char scyte_node_type;
 #define scyte_is_var(p)         (scyte_is_operand(p) && scyte_has_gradient(p))
 #define scyte_is_const(p)       (scyte_is_operand(p) && ((p)->type & CONST))
 #define scyte_is_placeholder(p) (scyte_is_operand(p) && !scyte_has_gradient(p) && !((p)->type & CONST))
+#define scyte_is_input(p) (scyte_is_placeholder(p) && ((p)->type & INPUT))
+#define scyte_is_ground_truth(p) (scyte_is_placeholder(p) && ((p)->type & GROUND_TRUTH))
 
 typedef enum {
     NOOP = 0,

@@ -189,7 +189,8 @@ void scyte_free_graph(int n, scyte_node** nodes)
 {
     for(int i = 0; i < n; ++i) {
         scyte_node* node = nodes[i];
-        free(node->vals);free(node->delta);
+        if(!node) continue;
+        free(node->vals); free(node->delta);
         free(node->tmp); free(node->params);
         free(node->children); free(node);
     }
@@ -270,6 +271,16 @@ void scyte_backward(int n, scyte_node** nodes, int from)
     for(i = 0; i <= from; ++i) nodes[i]->mark = 0;
 }
 
+static inline const char* get_node_type_str(scyte_node* node)
+{
+    if(scyte_is_var(node)) return "var";
+    else if(scyte_is_const(node)) return "const";
+    else if(scyte_is_input(node)) return "input";
+    else if(scyte_is_ground_truth(node)) return "label";
+    else if(scyte_is_placeholder(node)) return "placeholder";
+    return "N/A";
+}
+
 void scyte_print_graph(int n, scyte_node** nodes)
 {
     int i, j;
@@ -293,8 +304,11 @@ void scyte_print_graph(int n, scyte_node** nodes)
             }
             printf(")");
         }
+        /*
         else printf("%s", scyte_is_var(node) ? "var" : scyte_is_const(node) ? "const"
                         : scyte_is_placeholder(node) ? "placeholder" : "N/A");
+        */
+        else printf("%s", get_node_type_str(node));
         putchar('\n');
     }
     printf("----------------------------\n");
