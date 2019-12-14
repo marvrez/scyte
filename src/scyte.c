@@ -190,7 +190,7 @@ void scyte_free_graph(int n, scyte_node** nodes)
     for(int i = 0; i < n; ++i) {
         scyte_node* node = nodes[i];
         if(!node) continue;
-        free(node->vals); free(node->delta);
+        if(!scyte_is_operand(node)) free(node->vals), free(node->delta);
         free(node->tmp); free(node->params);
         free(node->children); free(node);
     }
