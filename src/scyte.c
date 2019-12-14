@@ -113,12 +113,12 @@ static inline void scyte_propagate_gradient_marks(int n, scyte_node** nodes)
     }
 }
 
-static void scyte_allocate_tensors(int n, scyte_node** nodes)
+static void scyte_allocate_op_nodes(int n, scyte_node** nodes)
 {
     scyte_propagate_gradient_marks(n, nodes);
     for(int i = 0; i < n; ++i) {
         scyte_node* node = nodes[i];
-        if(node->num_children == 0) continue;
+        if(scyte_is_operand(node)) continue;
         int num_elements = scyte_num_elements(node);
         node->vals = (float*)realloc(node->vals, num_elements*sizeof(float));
         if(scyte_has_gradient(node)) {
@@ -179,7 +179,7 @@ scyte_node** scyte_make_graph(int* num_nodes, int num_roots, scyte_node** roots)
     }
     scyte_node** graph = (scyte_node**)list_to_reverse_array(out);
     *num_nodes = out->size;
-    scyte_allocate_tensors(*num_nodes, graph);
+    scyte_allocate_op_nodes(*num_nodes, graph);
 
     free_list(l);
     return graph;
@@ -350,6 +350,8 @@ static inline scyte_node* scyte_load_node(FILE* fp, scyte_node** graph)
         int child_idx;
         node->children = (scyte_node**)calloc(node->num_children, sizeof(scyte_node*));
         fread(&node->op_type, sizeof(scyte_op_type), 1, fp);
+        node->forward = scyte_get_forward_function(node->op_type);
+        node->backward = scyte_get_backward_function(node->op_type);
         for(int j = 0; j < node->num_children; ++j) {
             fread(&child_idx, sizeof(int), 1, fp);
             node->children[j] = graph != NULL ? graph[child_idx] : 0;
@@ -377,5 +379,6 @@ scyte_node** scyte_load_graph(FILE* fp, int* n)
     }
     *n = num_nodes;
     scyte_propagate_gradient_marks(num_nodes, graph);
+    scyte_allocate_op_nodes(*n, graph);
     return graph;
 }

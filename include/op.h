@@ -40,6 +40,9 @@ void free_op_node(scyte_node* node);
 char* scyte_get_op_string(scyte_op_type op_type);
 scyte_op_type scyte_get_op_type(char* s);
 
+void (*scyte_get_forward_function(scyte_op_type op_type)) (struct scyte_node*);
+void (*scyte_get_backward_function(scyte_op_type op_type)) (struct scyte_node*);
+
 // shape0 is product of all shapes before axis,
 // while shape1 is product of all shapes after axis
 void get_reduced_dimensions(scyte_node* node, int axis, int* shape0, int* shape1);

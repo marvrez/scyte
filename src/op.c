@@ -116,6 +116,76 @@ scyte_op_type scyte_get_op_type(char* s)
     return NOP;
 }
 
+void (*scyte_get_forward_function(scyte_op_type op_type)) (struct scyte_node*)
+{
+    switch(op_type) {
+        case ADD: return scyte_add_forward;
+        case SUB: return scyte_sub_forward;
+        case MULTIPLY: return scyte_mul_forward;
+        case SQUARE: return scyte_square_forward;
+        case SIGMOID: return scyte_sigmoid_forward;
+        case TANH: return scyte_tanh_forward;
+        case RELU: return scyte_relu_forward;
+        case CMATMUL: return scyte_cmatmul_forward;
+        case MATMUL: return scyte_matmul_forward;
+        case AVG: return scyte_avg_forward;
+        case SELECT: return scyte_select_forward;
+        case DROPOUT: return scyte_dropout_forward;
+        case MAX: return scyte_max_forward;
+        case SOFTMAX: return scyte_softmax_forward;
+        case EXP: return scyte_exp_forward;
+        case LOG: return scyte_log_forward;
+        case SIN: return scyte_sin_forward;
+        case MSE: return scyte_mse_forward;
+        case RESHAPE: return scyte_reshape_forward;
+        case CONCAT: return scyte_concat_forward;
+        case SLICE: return scyte_slice_forward;
+        case NORMALIZE: return scyte_normalize_forward;
+        case REDUCE_SUM: return scyte_reduce_sum_forward;
+        case REDUCE_MEAN: return scyte_reduce_mean_forward;
+        case CATEGORICALXENT: return scyte_categorical_x_entropy_forward;
+        case LOGXENT: return scyte_logistic_x_entropy_forward;
+        case L1_NORM: return scyte_l1_norm_forward;
+        case NOP: default: return NULL;
+    }
+    return NULL;
+}
+
+void (*scyte_get_backward_function(scyte_op_type op_type)) (struct scyte_node*)
+{
+    switch(op_type) {
+        case ADD: return scyte_add_backward;
+        case SUB: return scyte_sub_backward;
+        case MULTIPLY: return scyte_mul_backward;
+        case SQUARE: return scyte_square_backward;
+        case SIGMOID: return scyte_sigmoid_backward;
+        case TANH: return scyte_tanh_backward;
+        case RELU: return scyte_relu_backward;
+        case CMATMUL: return scyte_cmatmul_backward;
+        case MATMUL: return scyte_matmul_backward;
+        case AVG: return scyte_avg_backward;
+        case SELECT: return scyte_select_backward;
+        case DROPOUT: return scyte_dropout_backward;
+        case MAX: return scyte_max_backward;
+        case SOFTMAX: return scyte_softmax_backward;
+        case EXP: return scyte_exp_backward;
+        case LOG: return scyte_log_backward;
+        case SIN: return scyte_sin_backward;
+        case MSE: return scyte_mse_backward;
+        case RESHAPE: return scyte_reshape_backward;
+        case CONCAT: return scyte_concat_backward;
+        case SLICE: return scyte_slice_backward;
+        case NORMALIZE: return scyte_normalize_backward;
+        case REDUCE_SUM: return scyte_reduce_sum_backward;
+        case REDUCE_MEAN: return scyte_reduce_mean_backward;
+        case CATEGORICALXENT: return scyte_categorical_x_entropy_backward;
+        case LOGXENT: return scyte_logistic_x_entropy_backward;
+        case L1_NORM: return scyte_l1_norm_backward;
+        case NOP: default: return NULL;
+    }
+    return NULL;
+}
+
 void get_reduced_dimensions(scyte_node* node, int axis, int* shape0, int* shape1)
 {
     *shape0 = *shape1 = 1;
