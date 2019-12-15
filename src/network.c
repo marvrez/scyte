@@ -41,6 +41,21 @@ static inline int get_num_consts(scyte_network* net)
     return count;
 }
 
+static inline int get_placeholder_dim(scyte_network* net, scyte_node_type type)
+{
+    int count = 0, dim = -1;
+    for(int i = 0; i < net->n; ++i) {
+        scyte_node* node = net->nodes[i];
+        if(scyte_is_placeholder(node) && (node->type & type)) {
+            ++count;
+            if(node->num_dims > 1) dim = scyte_num_elements(node) / node->shape[0]; // divide by batch size
+            else if(node->num_dims == 1) dim = node->shape[0]; // vector
+            else dim = 1; // scalar
+        }
+    }
+    return count == 1 ? dim : -1;
+}
+
 static inline void alloc_network(scyte_network* net)
 {
     int j = 0, k = 0;
@@ -99,6 +114,46 @@ const float* scyte_predict_network(scyte_network* net, float* data)
     }
     scyte_feed_net(net, INPUT, &data);
     return scyte_forward(net->n, net->nodes, out_idx);
+}
+
+static inline void optimizer_step(scyte_optimizer_params params, scyte_network* net, int n, float* g_prev, float* g_mean, float* g_var)
+{
+    if(params.type == ADAM) scyte_adam_step(params, n, net->deltas, g_var, g_mean, net->vals);
+    else if(params.type == RMSPROP) scyte_rmsprop_step(params, n, net->deltas, g_var, net->vals);
+    else if(params.type == SGD) scyte_sgd_step(params, n, net->deltas, g_prev, net->vals);
+}
+
+void scyte_train_network(scyte_network* net, scyte_optimizer_params params, int batch_size, int num_epochs, float val_split, int early_stop_patience, int n, float** x, float** y)
+{
+    int num_in = get_placeholder_dim(net, INPUT), num_target = get_placeholder_dim(net, GROUND_TRUTH);
+    if(num_in < 0 || num_target < 0) return;
+    int num_vars = get_num_vars(net), num_consts = get_num_consts(net);
+    float** xx = (float**)malloc(n*sizeof(float*)), **yy = (float**)malloc(n*sizeof(float*));
+
+    float* g_var=NULL, *g_mean=NULL, *g_prev=NULL;
+    if(params.type == SGD) g_prev = (float*)calloc(num_vars, sizeof(float));
+    else if(params.type == RMSPROP || params.type == ADAM) {
+        g_var = (float*)calloc(num_vars, sizeof(float));
+        if(params.type == ADAM) g_mean = (float*)calloc(num_vars, sizeof(float));
+    }
+
+    // temporary buffers used for storing the best network values, based on validation metrics
+    float* best_vals = (float*)malloc(num_vars*sizeof(float));
+    float* best_consts = (float*)malloc(num_consts*sizeof(float));
+
+    float* input = (float*)malloc(num_in*batch_size*sizeof(float));
+    float* target = (float*)malloc(num_target*batch_size*sizeof(float));
+    scyte_feed_net(net, INPUT, &input); // input node will be binded to input array
+    scyte_feed_net(net, GROUND_TRUTH, &target); // ground truth node will be binded to target array
+
+    int num_val = n*val_split, num_train = n - num_val, keep_best = 0;
+    for(int i = 0; i < num_epochs; ++i) {
+    }
+    if(num_val > 0 && keep_best) {
+        memcpy(net->vals, best_vals, num_vars*sizeof(float));
+        memcpy(net->consts, best_consts, num_consts*sizeof(float));
+    }
+    free(xx); free(yy); free(best_vals); free(best_consts); free(input); free(target);
 }
 
 void scyte_free_network(scyte_network* net)
