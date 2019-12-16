@@ -1,8 +1,11 @@
+//#define SCYTE_VERBOSE
 #include "network.h"
 
 #include "logger.h"
 
 #include <stdlib.h>
+#include <assert.h>
+#include <float.h>
 
 // switch between forward and backward propagation mode
 static inline void switch_propagation_mode(scyte_network* net, int is_backward)
@@ -116,6 +119,18 @@ const float* scyte_predict_network(scyte_network* net, float* data)
     return scyte_forward(net->n, net->nodes, out_idx);
 }
 
+static inline float scyte_calculate_cost(scyte_network* net, int calc_grads)
+{
+    int cost_idx = scyte_find_node(net, COST);
+    if(cost_idx < 0) {
+        LOG_ERROR("couldn't find any cost node");
+        assert(0);
+    }
+    float cost = *scyte_forward(net->n, net->nodes, cost_idx);
+    if(calc_grads) scyte_backward(net->n, net->nodes, cost_idx);
+    return cost;
+}
+
 static inline void optimizer_step(scyte_optimizer_params params, scyte_network* net, int n, float* g_prev, float* g_mean, float* g_var)
 {
     if(params.type == ADAM) scyte_adam_step(params, n, net->deltas, g_var, g_mean, net->vals);
@@ -123,37 +138,76 @@ static inline void optimizer_step(scyte_optimizer_params params, scyte_network* 
     else if(params.type == SGD) scyte_sgd_step(params, n, net->deltas, g_prev, net->vals);
 }
 
-void scyte_train_network(scyte_network* net, scyte_optimizer_params params, int batch_size, int num_epochs, float val_split, int early_stop_patience, int n, float** x, float** y)
+void scyte_train_network(scyte_network* net, scyte_optimizer_params params, int batch_size, int num_epochs, float val_split, int early_stop_patience, scyte_data data)
 {
+    int n = data.X.rows;
     int num_in = get_placeholder_dim(net, INPUT), num_target = get_placeholder_dim(net, GROUND_TRUTH);
-    if(num_in < 0 || num_target < 0) return;
+    assert(num_in == data.X.cols && num_target == data.y.cols);
     int num_vars = get_num_vars(net), num_consts = get_num_consts(net);
-    float** xx = (float**)malloc(n*sizeof(float*)), **yy = (float**)malloc(n*sizeof(float*));
+    // temporary buffers used for storing the best network values, based on validation metrics
+    float* best_vals = (float*)malloc(num_vars*sizeof(float));
+    float* best_consts = (float*)malloc(num_consts*sizeof(float));
 
-    float* g_var=NULL, *g_mean=NULL, *g_prev=NULL;
+    float* g_var = NULL, *g_mean = NULL, *g_prev = NULL;
     if(params.type == SGD) g_prev = (float*)calloc(num_vars, sizeof(float));
     else if(params.type == RMSPROP || params.type == ADAM) {
         g_var = (float*)calloc(num_vars, sizeof(float));
         if(params.type == ADAM) g_mean = (float*)calloc(num_vars, sizeof(float));
     }
 
-    // temporary buffers used for storing the best network values, based on validation metrics
-    float* best_vals = (float*)malloc(num_vars*sizeof(float));
-    float* best_consts = (float*)malloc(num_consts*sizeof(float));
+    float* X = (float*)malloc(num_in*batch_size*sizeof(float));
+    float* y = (float*)malloc(num_target*batch_size*sizeof(float));
+    scyte_feed_net(net, INPUT, &X); // input node will be binded to input array
+    scyte_feed_net(net, GROUND_TRUTH, &y); // ground truth node will be binded to target array
 
-    float* input = (float*)malloc(num_in*batch_size*sizeof(float));
-    float* target = (float*)malloc(num_target*batch_size*sizeof(float));
-    scyte_feed_net(net, INPUT, &input); // input node will be binded to input array
-    scyte_feed_net(net, GROUND_TRUTH, &target); // ground truth node will be binded to target array
-
-    int num_val = n*val_split, num_train = n - num_val, keep_best = 0;
+    int num_val = n*val_split, num_train = n - num_val, keep_best = 0, no_improvement_count = 0;
+    float best_val_cost = FLT_MAX;
     for(int i = 0; i < num_epochs; ++i) {
+        int num_processed = 0;
+        float train_cost = 0.f, val_cost = 0.f;
+        // training
+        switch_propagation_mode(net, 1);
+        while(num_processed < num_train) {
+            int bs = num_train - num_processed < batch_size ? num_train - num_processed : batch_size;
+            scyte_random_batch(data, bs, X, y);
+            train_cost += bs*scyte_calculate_cost(net, 1);
+            optimizer_step(params, net, num_vars, g_prev, g_mean, g_var);
+            num_processed += bs;
+        }
+        train_cost /= num_train;
+
+        // validation
+        num_processed = 0;
+        switch_propagation_mode(net, 0);
+        while(num_processed < num_val) {
+            int bs = num_val - num_processed < batch_size ? num_val - num_processed : batch_size;
+            scyte_random_batch(data, bs, X, y);
+            val_cost += bs*scyte_calculate_cost(net, 0);
+            num_processed += bs;
+        }
+#ifdef SCYTE_VERBOSE
+        fprintf(stderr, "epoch %d – training cost: %.3f ", i+1, train_cost);
+        if(num_val > 0) {
+            val_cost /= num_val;
+            fprintf(stderr, " validation cost: %g", val_cost);
+        }
+        fprintf(stderr, "\n");
+#endif
+        // early stopping if no changes for early_stop_patience epochs
+        if(num_val > 0 && i >= early_stop_patience) {
+            if(val_cost < best_val_cost) {
+                keep_best = 1, no_improvement_count = 0, best_val_cost = val_cost;
+                memcpy(best_vals, net->vals, num_vars*sizeof(float));
+                memcpy(best_consts, net->consts, num_consts*sizeof(float));
+            }
+            else if(++no_improvement_count >= early_stop_patience) break;
+        }
     }
     if(num_val > 0 && keep_best) {
         memcpy(net->vals, best_vals, num_vars*sizeof(float));
         memcpy(net->consts, best_consts, num_consts*sizeof(float));
     }
-    free(xx); free(yy); free(best_vals); free(best_consts); free(input); free(target);
+    free(best_vals); free(best_consts); free(X); free(y);
 }
 
 void scyte_free_network(scyte_network* net)
