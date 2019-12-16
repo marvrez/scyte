@@ -40,10 +40,9 @@ void scyte_sigmoid_backward(scyte_node* node)
     scyte_node* operand = node->children[0];
     int n = scyte_num_elements(operand);
     if(scyte_has_gradient(operand)) {
-        float sig;
         #pragma omp parallel for
         for(int i = 0; i < n; ++i) {
-            sig = operand->vals[i];
+            float sig = node->vals[i];
             operand->delta[i] += node->delta[i]*sig*(1.f - sig);
         }
     }

@@ -11,6 +11,7 @@ scyte_optimizer_params scyte_adam_params(float lr, float decay, float momentum, 
     p.type = ADAM;
     p.lr = lr;
     p.momentum = momentum;
+    p.decay = decay;
     p.beta1 = beta1, p.beta2 = beta2;
     return p;
 }
@@ -22,6 +23,7 @@ scyte_optimizer_params scyte_rmsprop_params(float lr, float decay, float momentu
     p.lr = lr;
     p.momentum = momentum;
     p.alpha = alpha;
+    p.decay = decay;
     return p;
 }
 
@@ -30,6 +32,7 @@ scyte_optimizer_params scyte_sgd_params(float lr, float decay, float momentum)
     scyte_optimizer_params p;
     p.type = SGD;
     p.lr = lr;
+    p.decay = decay;
     p.momentum = momentum;
     return p;
 }
