@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <limits.h>
 
 #define M_TWO_PI 6.2831853071795864769252866f
 
@@ -72,6 +73,44 @@ char* get_shape_string(int n, int* shape)
     }
     strcat(ret, ")");
     return ret;
+}
+
+char *fgetl(FILE *fp)
+{
+    if(feof(fp)) return 0;
+    size_t size = 512;
+    char* line = malloc(size*sizeof(char));
+    if(!fgets(line, size, fp)){
+        free(line);
+        return 0;
+    }
+    size_t curr = strlen(line);
+    while((line[curr-1] != '\n') && !feof(fp)) {
+        if(curr == size-1) {
+            size *= 2;
+            line = realloc(line, size*sizeof(char));
+        }
+        size_t readsize = size-curr;
+        if(readsize > INT_MAX) readsize = INT_MAX-1;
+        fgets(&line[curr], readsize, fp);
+        curr = strlen(line);
+    }
+    if(line[curr-1] == '\n') line[curr-1] = '\0';
+    return line;
+}
+
+list* read_lines(char* filename)
+{
+    char* path;
+    FILE* file = fopen(filename, "r");
+    if(!file) {
+        fprintf(stderr, "couldn't open file %s\n", filename);
+        exit(0);
+    }
+    list* lines = make_list();
+    while((path = fgetl(file))) list_append(lines, path);
+    fclose(file);
+    return lines;
 }
 
 int qsortf_cmp(const void* a, const void* b)

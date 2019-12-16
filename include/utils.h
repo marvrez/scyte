@@ -1,6 +1,9 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include "list.h"
+#include <stdio.h>
+
 double time_now();
 float randn();
 float random_normal(float mu, float sigma);
@@ -9,6 +12,9 @@ float random_uniform(float min, float max);
 int get_sign(float val);
 
 char* get_shape_string(int n, int* shape);
+
+char* fgetl(FILE* fp);
+list* read_lines(char* filename);
 
  // sorts in increasing value
 void qsortf(int n, float* data);
