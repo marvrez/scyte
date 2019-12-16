@@ -49,7 +49,7 @@ void scyte_mse_backward(scyte_node* node)
         float s = 2.f * node->delta[0] / n;
         #pragma omp parallel for
         for(int i = 0; i < n; ++i) {
-            pred->delta[i] += s*(truth->vals[i] - pred->vals[i]);
+            pred->delta[i] += s*(pred->vals[i] - truth->vals[i]);
         }
     }
 }

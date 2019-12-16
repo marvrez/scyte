@@ -42,7 +42,7 @@ void scyte_logistic_x_entropy_forward(scyte_node* node)
     for(int i = 0; i < n; ++i) {
         float p = pred->vals[i];
         float t = truth->vals[i];
-        cost += -t*logf(p) - (1-t)*logf(1-p);
+        cost += -t*logf(p + EPS) - (1-t)*logf(1-p + EPS);
     }
     node->vals[0] = cost / (float)n;
 }
@@ -57,6 +57,6 @@ void scyte_logistic_x_entropy_backward(scyte_node* node)
     for(int i = 0; i < n; ++i) {
         float p = pred->vals[i];
         float t = truth->vals[i];
-        pred->delta[i] += s*(-t/p + (1.f-t)/(1.f-p));
+        pred->delta[i] += s*(-t/(p+EPS) + (1.f-t)/(1.f-p + EPS));
     }
 }
