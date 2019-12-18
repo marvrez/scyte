@@ -6,6 +6,8 @@
 #include <math.h>
 #include <float.h>
 
+#define EPS 1e-9f
+
 static inline int sync_dims(scyte_node* node)
 {
     scyte_copy_shape(node->children[0], node);
@@ -31,15 +33,15 @@ void scyte_softmax_forward(scyte_node* node)
     int batch_size = scyte_num_elements(operand) / dim;
     #pragma omp parallel for
     for(int i = 0; i < batch_size; ++i) {
-        float max = -FLT_MAX, scale = 0.f;
+        float max = -FLT_MAX, sum = 0.f;
         float* out_vals  = &node->vals[i*dim];
         float* in_vals   = &operand->vals[i*dim];
-        for(int j = 0; j < dim; ++j) max = max > in_vals[j] ? max : in_vals[j];
+        for(int j = 0; j < dim; ++j) max = (max > in_vals[j]) ? max : in_vals[j];
         for(int j = 0; j < dim; ++j) {
             out_vals[j] = expf(in_vals[j] - max);
-            scale += out_vals[j];
+            sum += out_vals[j];
         }
-        scale = 1.f / scale;
+        float scale = 1.f / (sum + EPS);
         for(int j = 0; j < dim; ++j) out_vals[j] *= scale;
     }
 }
