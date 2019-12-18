@@ -48,7 +48,6 @@ void scyte_l1_norm_backward(scyte_node* node)
     int n = scyte_num_elements(truth);
     if(scyte_has_gradient(pred)) {
         float s = node->delta[0] / n;
-        #pragma omp parallel for
         for(int i = 0; i < n; ++i) {
             pred->delta[i] += s*get_sign(truth->vals[i] - pred->vals[i]);
         }

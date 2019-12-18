@@ -71,7 +71,6 @@ void scyte_reduce_sum_forward(scyte_node* node)
     get_reduced_dimensions(operand, axis, &shape0, &shape1);
 
     set_cpu(scyte_num_elements(node), 0.f, node->vals);
-    #pragma omp parallel for
     for(int i = 0; i < shape0; ++i) {
         int out_base_idx = i*shape1;
         for(int j = 0; j < axis_shape; ++j) {
@@ -92,7 +91,6 @@ void scyte_reduce_sum_backward(scyte_node* node)
     get_reduced_dimensions(operand, axis, &shape0, &shape1);
 
     if(scyte_has_gradient(operand)) {
-        #pragma omp parallel for
         for(int i = 0; i < shape0; ++i) {
             int in_base_idx = i*shape1;
             for(int j = 0; j < axis_shape; ++j) {

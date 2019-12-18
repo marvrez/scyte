@@ -28,7 +28,6 @@ void scyte_tanh_forward(scyte_node* node)
     scyte_node* operand = node->children[0];
     int n = scyte_num_elements(operand);
     float y;
-    #pragma omp parallel for private(y)
     for(int i = 0; i < n; ++i) {
         y = expf(-2.f*operand->vals[i]);
         node->vals[i] = (1.f - y) / (1.f + y);
@@ -41,7 +40,6 @@ void scyte_tanh_backward(scyte_node* node)
     int n = scyte_num_elements(operand);
     if(scyte_has_gradient(operand)) {
         float tanh_val;
-        #pragma omp parallel for private(tanh_val)
         for(int i = 0; i < n; ++i) {
             tanh_val = operand->vals[i];
             operand->delta[i] += node->delta[i]*(1.f - tanh_val*tanh_val);

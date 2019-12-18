@@ -38,7 +38,6 @@ void scyte_logistic_x_entropy_forward(scyte_node* node)
     scyte_node* pred = node->children[0], *truth = node->children[1];
     int n = scyte_num_elements(pred);
     float cost = 0.f;
-    #pragma omp parallel for
     for(int i = 0; i < n; ++i) {
         float p = pred->vals[i];
         float t = truth->vals[i];
@@ -53,7 +52,6 @@ void scyte_logistic_x_entropy_backward(scyte_node* node)
     if(!scyte_has_gradient(pred)) return;
     int n = scyte_num_elements(pred);
     float s = node->delta[0] / (float)n;
-    #pragma omp parallel for
     for(int i = 0; i < n; ++i) {
         float p = pred->vals[i];
         float t = truth->vals[i];

@@ -122,7 +122,6 @@ void gemm_cpu(int trans_a, int trans_b, int M, int N, int K,
     int ldb = trans_b ? K : N;
     int ldc = N;
 
-    #pragma omp parallel for
     for(int i = 0; i < M*N; ++i) {
         C[i] *= beta;
     }
@@ -161,7 +160,6 @@ void gemv_cpu(int trans_a, int M, int N, float alpha,
         const float* A, const float* x, float beta, float* y)
 {
     int lda = trans_a ? N : M;
-    #pragma omp parallel for
     for(int i = 0; i < lda; ++i) {
         y[i] *= beta;
     }
@@ -172,7 +170,6 @@ void gemv_cpu(int trans_a, int M, int N, float alpha,
 
 void axpy_cpu(int N, float alpha, const float* X, float* Y)
 {
-    #pragma omp parallel for
     for(int i = 0; i < N; ++i) {
         Y[i] += alpha*X[i];
     }
@@ -180,7 +177,6 @@ void axpy_cpu(int N, float alpha, const float* X, float* Y)
 
 void axpby_cpu(int N, float alpha, const float* X, float beta, float* Y)
 {
-    #pragma omp parallel for
     for(int i = 0; i < N; ++i) {
         Y[i] = alpha*X[i] + beta*Y[i];
     }
@@ -188,7 +184,6 @@ void axpby_cpu(int N, float alpha, const float* X, float beta, float* Y)
 
 void scale_cpu(int n, float alpha, const float* x, float* y)
 {
-    #pragma omp parallel for
     for(int i = 0; i < n; ++i) {
         y[i] = alpha*x[i];
     }
@@ -197,7 +192,6 @@ void scale_cpu(int n, float alpha, const float* x, float* y)
 
 void add_cpu(int n, const float* x, const float* y, float* z)
 {
-    #pragma omp parallel for
     for(int i = 0; i < n; ++i) {
         z[i] = x[i] + y[i];
     }
@@ -205,7 +199,6 @@ void add_cpu(int n, const float* x, const float* y, float* z)
 
 void sub_cpu(int n, const float* x, const float* y, float* z)
 {
-    #pragma omp parallel for
     for(int i = 0; i < n; ++i) {
         z[i] = x[i] - y[i];
     }
@@ -213,7 +206,6 @@ void sub_cpu(int n, const float* x, const float* y, float* z)
 
 void mul_cpu(int n, const float* x, const float* y, float* z)
 {
-    #pragma omp parallel for
     for(int i = 0; i < n; ++i) {
         z[i] = x[i]*y[i];
     }
@@ -221,7 +213,6 @@ void mul_cpu(int n, const float* x, const float* y, float* z)
 
 void div_cpu(int n, const float* x, const float* y, float* z)
 {
-    #pragma omp parallel for
     for(int i = 0; i < n; ++i) {
         z[i] = x[i]/y[i];
     }
@@ -229,7 +220,6 @@ void div_cpu(int n, const float* x, const float* y, float* z)
 
 void mul_sum_cpu(int n, const float* x, const float* y, float* z)
 {
-    #pragma omp parallel for
     for(int i = 0; i < n; ++i) {
         z[i] += x[i]*y[i];
     }
@@ -237,7 +227,6 @@ void mul_sum_cpu(int n, const float* x, const float* y, float* z)
 
 void pow_cpu(int n, float alpha, const float* x, float* y)
 {
-    #pragma omp parallel for
     for(int i = 0; i < n; ++i) {
         y[i] = pow(x[i], alpha);
     }
@@ -245,7 +234,6 @@ void pow_cpu(int n, float alpha, const float* x, float* y)
 
 void bias_cpu(int n, float alpha, const float* x, float* y)
 {
-    #pragma omp parallel for
     for (int i = 0; i < n; ++i) {
         y[i] = alpha + x[i];
     }
@@ -259,7 +247,6 @@ void copy_cpu(int N, const float* X, float* Y)
 
 void exp_cpu(int n, const float* x, float* y)
 {
-    #pragma omp parallel for
     for (int i = 0; i < n; ++i) {
         y[i] = expf(x[i]);
     }
@@ -267,7 +254,6 @@ void exp_cpu(int n, const float* x, float* y)
 
 void abs_cpu(int n, const float* x, float* y)
 {
-    #pragma omp parallel for
     for (int i = 0; i < n; ++i) {
         y[i] = fabsf(x[i]);
     }
@@ -279,7 +265,6 @@ void set_cpu(int N, float alpha, float* y)
         memset(y, 0.f, sizeof(float)*N);
         return;
     }
-    #pragma omp parallel for
     for (int i = 0; i < N; ++i) {
         y[i] = alpha;
     }

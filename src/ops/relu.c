@@ -28,7 +28,6 @@ void scyte_relu_forward(scyte_node* node)
 {
     scyte_node* operand = node->children[0];
     int n = scyte_num_elements(operand);
-    #pragma omp parallel for
     for(int i = 0; i < n; ++i) {
         node->vals[i] = operand->vals[i]*(operand->vals[i] > 0.f);
     }
@@ -39,7 +38,6 @@ void scyte_relu_backward(scyte_node* node)
     scyte_node* operand = node->children[0];
     int n = scyte_num_elements(operand);
     if(scyte_has_gradient(operand)) {
-        #pragma omp parallel for
         for(int i = 0; i < n; ++i) {
             operand->delta[i] += node->delta[i]*(operand->vals[i] > 0.f);
         }

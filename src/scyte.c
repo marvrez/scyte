@@ -208,7 +208,6 @@ void scyte_copy_shape(const scyte_node* src, scyte_node* dst)
 void scyte_fill_vals(scyte_node* node, float fill_val)
 {
     int n = scyte_num_elements(node);
-    #pragma omp parallel for
     for(int i = 0; i < n; ++i) {
         node->vals[i] = fill_val;
     }
