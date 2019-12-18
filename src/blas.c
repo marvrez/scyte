@@ -18,10 +18,10 @@ extern "C" {
 void gemm_cpu(int trans_a, int trans_b, int M, int N, int K,
         float alpha, const float* A, const float* B, float beta, float* C)
 {
-    int lda = trans_a ? K : M;
-    int ldb = trans_b ? N : K;
+    int lda = trans_a ? M : K;
+    int ldb = trans_b ? K : N;
     int ldc = N;
-    cblas_sgemm(CblasRowMajor, trans_a ? CblasTrans : CblasTrans, trans_b ? CblasTrans : CblasNoTrans, 
+    cblas_sgemm(CblasRowMajor, trans_a ? CblasTrans : CblasNoTrans, trans_b ? CblasTrans : CblasNoTrans,
             M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
 }
 
@@ -118,8 +118,8 @@ static inline void gemm_tt(int M, int N, int K, float alpha,
 void gemm_cpu(int trans_a, int trans_b, int M, int N, int K,
         float alpha, const float* A, const float* B, float beta, float* C)
 {
-    int lda = trans_a ? K : M;
-    int ldb = trans_b ? N : K;
+    int lda = trans_a ? M : K;
+    int ldb = trans_b ? K : N;
     int ldc = N;
 
     #pragma omp parallel for
