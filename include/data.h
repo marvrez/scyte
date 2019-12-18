@@ -3,7 +3,7 @@
 
 typedef struct {
     int rows, cols;
-    float* data;
+    float** data;
 } matrix;
 
 typedef struct {

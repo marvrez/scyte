@@ -1,7 +1,8 @@
-//#define SCYTE_VERBOSE
+#define SCYTE_VERBOSE
 #include "network.h"
 
 #include "logger.h"
+#include "utils.h"
 
 #include <stdlib.h>
 #include <assert.h>
@@ -163,6 +164,7 @@ void scyte_train_network(scyte_network* net, scyte_optimizer_params params, int 
     int num_val = n*val_split, num_train = n - num_val, keep_best = 0, no_improvement_count = 0;
     float best_val_cost = FLT_MAX;
     for(int i = 0; i < num_epochs; ++i) {
+        double t1 = time_now();
         int num_processed = 0;
         float train_cost = 0.f, val_cost = 0.f;
         // training
@@ -189,8 +191,10 @@ void scyte_train_network(scyte_network* net, scyte_optimizer_params params, int 
         fprintf(stderr, "epoch %d – training cost: %.3f ", i+1, train_cost);
         if(num_val > 0) {
             val_cost /= num_val;
-            fprintf(stderr, " validation cost: %g", val_cost);
+            fprintf(stderr, "- validation cost: %g ", val_cost);
         }
+        double t2 = time_now();
+        fprintf(stderr, "- %.3gs/iter", t2 - t1);
         fprintf(stderr, "\n");
 #endif
         // early stopping if no changes for early_stop_patience epochs
