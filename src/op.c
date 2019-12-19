@@ -181,6 +181,43 @@ void (*scyte_get_backward_function(scyte_op_type op_type)) (struct scyte_node*)
         case CATEGORICALXENT: return scyte_categorical_x_entropy_backward;
         case LOGXENT: return scyte_logistic_x_entropy_backward;
         case L1_NORM: return scyte_l1_norm_backward;
+        case MAXPOOL2D: return scyte_maxpool2d_backward;
+        case CONV2D: return scyte_conv2d_backward;
+        case NOP: default: return NULL;
+    }
+    return NULL;
+}
+
+int (*scyte_get_resync_function(scyte_op_type op_type)) (struct scyte_node*)
+{
+    switch(op_type) {
+        case ADD: return scyte_add_sync_dims;
+        case SUB: return scyte_sub_sync_dims;
+        case MULTIPLY: return scyte_mul_sync_dims;
+        case SQUARE: return scyte_square_sync_dims;
+        case SIGMOID: return scyte_sigmoid_sync_dims;
+        case TANH: return scyte_tanh_sync_dims;
+        case RELU: return scyte_relu_sync_dims;
+        case CMATMUL: return scyte_cmatmul_sync_dims;
+        case MATMUL: return scyte_matmul_sync_dims;
+        case AVG: return scyte_avg_sync_dims;
+        case SELECT: return scyte_select_sync_dims;
+        case DROPOUT: return scyte_dropout_sync_dims;
+        case MAX: return scyte_max_sync_dims;
+        case SOFTMAX: return scyte_softmax_sync_dims;
+        case EXP: return scyte_exp_sync_dims;
+        case LOG: return scyte_log_sync_dims;
+        case SIN: return scyte_sin_sync_dims;
+        case MSE: return scyte_mse_sync_dims;
+        case RESHAPE: return scyte_reshape_sync_dims;
+        case CONCAT: return scyte_concat_sync_dims;
+        case SLICE: return scyte_slice_sync_dims;
+        case NORMALIZE: return scyte_normalize_sync_dims;
+        case REDUCE_SUM: return scyte_reduce_sum_sync_dims;
+        case REDUCE_MEAN: return scyte_reduce_mean_sync_dims;
+        case CATEGORICALXENT: return scyte_categorical_x_entropy_sync_dims;
+        case LOGXENT: return scyte_logistic_x_entropy_sync_dims;
+        case L1_NORM: return scyte_l1_norm_sync_dims;
         case NOP: default: return NULL;
     }
     return NULL;

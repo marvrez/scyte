@@ -127,6 +127,24 @@ static void scyte_allocate_op_nodes(int n, scyte_node** nodes)
     }
 }
 
+void scyte_set_batch_size(int n, scyte_node** nodes, int batch_size)
+{
+    int old_batch_size = batch_size, need_resync = 0;
+    for(int i = 0; i < n; ++i) {
+        scyte_node* node = nodes[i];
+        if(scyte_is_placeholder(node)) {
+            old_batch_size = node->shape[0];
+            if(old_batch_size != batch_size) {
+                node->shape[0] = batch_size, need_resync = 1;
+            }
+        }
+        else if(!scyte_is_operand(node) && need_resync) scyte_get_resync_function(node->op_type)(node);
+    }
+    int need_alloc = old_batch_size < batch_size;
+    for(int i = 0; i < n; ++i) if(!scyte_is_operand(nodes[i]) && !nodes[i]->vals) need_alloc = 1;
+    if(need_alloc) scyte_allocate_op_nodes(n, nodes);
+}
+
 scyte_node** scyte_make_graph(int* num_nodes, int num_roots, scyte_node** roots)
 {
     list* l = make_list();

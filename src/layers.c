@@ -42,7 +42,6 @@ scyte_node* scyte_layer_dropout(scyte_node* in, float dropout_rate)
     scyte_node* rate = scyte_scalar(CONST, dropout_rate);
     scyte_node* switch_nodes[] = { in, scyte_dropout(in, rate) };
     fprintf(stderr, "dropout        p=%.2f            %4d\n", dropout_rate, scyte_num_elements(in));
-    // TODO: switch between nodes during forward and backward passes
     return scyte_dynamic_select(2, switch_nodes); 
 }
 

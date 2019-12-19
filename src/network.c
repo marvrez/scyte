@@ -116,6 +116,7 @@ const float* scyte_predict_network(scyte_network* net, float* data)
         LOG_ERROR("couldn't find any output node");
         return NULL;
     }
+    scyte_set_batch_size(net->n, net->nodes, 1);
     scyte_feed_net(net, INPUT, &data);
     return scyte_forward(net->n, net->nodes, out_idx);
 }
@@ -172,6 +173,7 @@ void scyte_train_network(scyte_network* net, scyte_optimizer_params params, int 
         while(num_processed < num_train) {
             int bs = num_train - num_processed < batch_size ? num_train - num_processed : batch_size;
             scyte_random_batch(data, bs, X, y);
+            scyte_set_batch_size(net->n, net->nodes, bs);
             train_cost += bs*scyte_calculate_cost(net, 1);
             optimizer_step(params, net, num_vars, g_prev, g_mean, g_var);
             num_processed += bs;
@@ -184,6 +186,7 @@ void scyte_train_network(scyte_network* net, scyte_optimizer_params params, int 
         while(num_processed < num_val) {
             int bs = num_val - num_processed < batch_size ? num_val - num_processed : batch_size;
             scyte_random_batch(data, bs, X, y);
+            scyte_set_batch_size(net->n, net->nodes, bs);
             val_cost += bs*scyte_calculate_cost(net, 0);
             num_processed += bs;
         }
@@ -225,6 +228,7 @@ void scyte_free_network(scyte_network* net)
 void scyte_save_network(const char* filename, scyte_network* net)
 {
     FILE* fp = fopen(filename, "wb");
+    scyte_set_batch_size(net->n, net->nodes, 1);
     fwrite("SCYTE", sizeof(char), 5, fp); // magic number memes
     scyte_save_graph(fp, net->n, net->nodes);
     fwrite(net->vals, sizeof(float), get_num_vars(net), fp);

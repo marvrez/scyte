@@ -2,6 +2,7 @@
 #define NETWORK_H
 
 #include "scyte.h"
+#include "op.h"
 #include "layers.h"
 #include "optimizer.h"
 #include "data.h"

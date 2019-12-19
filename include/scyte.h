@@ -89,6 +89,7 @@ typedef struct {
 
 // node->vals are set to fill_val if num_dims <= 1
 scyte_node* scyte_placeholder(unsigned num_dims, int shape[SCYTE_MAX_DIMS]);
+scyte_node* scyte_var(unsigned num_dims, int shape[SCYTE_MAX_DIMS], float fill_val);
 scyte_node* scyte_scalar(scyte_node_type type, float val);
 scyte_node* scyte_bias(int n, float default_val);
 scyte_node* scyte_weight(int rows, int cols);
@@ -101,6 +102,7 @@ int scyte_feed_net(scyte_network* net, scyte_node_type type, float** vals);
 // feed a single placeholder
 void scyte_feed_placeholder(scyte_node* node, float* vals);
 
+void scyte_set_batch_size(int n, scyte_node** nodes, int batch_size);
 scyte_node** scyte_make_graph(int* num_nodes, int num_roots, scyte_node** roots);
 void scyte_free_graph(int n, scyte_node** nodes);
 scyte_node** scyte_copy_graph(int n, scyte_node** nodes, int batch_size);
