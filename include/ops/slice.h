@@ -6,6 +6,8 @@
 // slice an axis in inclusive range [start, start+size)
 scyte_node* scyte_slice(scyte_node* x, int axis, int start, int size);
 
+int scyte_slice_sync_dims(scyte_node* node);
+
 void scyte_slice_forward(scyte_node* node);
 void scyte_slice_backward(scyte_node* node);
 

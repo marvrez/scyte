@@ -3,7 +3,7 @@
 #include "blas.h"
 #include "op.h"
 
-static inline int sync_dims(scyte_node* node)
+int scyte_exp_sync_dims(scyte_node* node)
 {
     scyte_copy_shape(node->children[0], node);
     return 1;
@@ -13,7 +13,7 @@ scyte_node* scyte_exp(scyte_node* x)
 {
     scyte_node* node = make_op1_node(EXP, x);
     node->forward = scyte_exp_forward, node->backward = scyte_exp_backward;
-    if(!sync_dims(node)) {
+    if(!scyte_exp_sync_dims(node)) {
         free_op_node(node);
         return NULL;
     }

@@ -8,7 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-static inline int sync_dims(scyte_node* node)
+int scyte_max_sync_dims(scyte_node* node)
 {
     int n = scyte_num_elements(node->children[0]);
     for(int i = 1; i < node->num_children; ++i) {
@@ -31,7 +31,7 @@ scyte_node* scyte_max(int n, scyte_node** nodes)
 {
     scyte_node* node = make_opn_node(MAX, n, nodes);
     node->forward = scyte_max_forward, node->backward = scyte_max_backward;
-    if(!sync_dims(node)) {
+    if(!scyte_max_sync_dims(node)) {
         free_op_node(node);
         return NULL;
     }

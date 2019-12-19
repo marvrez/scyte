@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 
-static inline int sync_dims(scyte_node* node)
+int scyte_mse_sync_dims(scyte_node* node)
 {
     int n0 = scyte_num_elements(node->children[0]);
     int n1 = scyte_num_elements(node->children[1]);
@@ -21,7 +21,7 @@ scyte_node* scyte_mse(scyte_node* truth, scyte_node* pred)
 {
     scyte_node* node = make_op2_node(MSE, truth, pred);
     node->forward = scyte_mse_forward, node->backward = scyte_mse_backward;
-    if(!sync_dims(node)) {
+    if(!scyte_mse_sync_dims(node)) {
         free_op_node(node);
         return NULL;
     }

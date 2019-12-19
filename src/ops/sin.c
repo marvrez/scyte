@@ -5,7 +5,7 @@
 
 #include <math.h>
 
-static inline int sync_dims(scyte_node* node)
+int scyte_sin_sync_dims(scyte_node* node)
 {
     scyte_copy_shape(node->children[0], node);
     return 1;
@@ -15,7 +15,7 @@ scyte_node* scyte_sin(scyte_node* x)
 {
     scyte_node* node = make_op1_node(SIN, x);
     node->forward = scyte_sin_forward, node->backward = scyte_sin_backward;
-    if(!sync_dims(node)) {
+    if(!scyte_sin_sync_dims(node)) {
         free_op_node(node);
         return NULL;
     }

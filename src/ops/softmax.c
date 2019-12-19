@@ -8,7 +8,7 @@
 
 #define EPS 1e-9f
 
-static inline int sync_dims(scyte_node* node)
+int scyte_softmax_sync_dims(scyte_node* node)
 {
     scyte_copy_shape(node->children[0], node);
     return 1;
@@ -18,7 +18,7 @@ scyte_node* scyte_softmax(scyte_node* x)
 {
     scyte_node* node = make_op1_node(SOFTMAX, x);
     node->forward = scyte_softmax_forward, node->backward = scyte_softmax_backward;
-    if(!sync_dims(node)) {
+    if(!scyte_softmax_sync_dims(node)) {
         free_op_node(node);
         return NULL;
     }

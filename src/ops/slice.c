@@ -26,7 +26,7 @@ static inline void set_slice_params(scyte_node* node, int axis, int start, int s
     node->params_size = sizeof(int)*3;
 }
 
-static inline int sync_dims(scyte_node* node)
+int scyte_slice_sync_dims(scyte_node* node)
 {
     scyte_node* input = node->children[0];
     int axis, start, size;
@@ -43,7 +43,7 @@ scyte_node* scyte_slice(scyte_node* x, int axis, int start, int size)
     scyte_node* node = make_op1_node(SLICE, x);
     set_slice_params(node, axis, start, size);
     node->forward = scyte_slice_forward, node->backward = scyte_slice_backward;
-    if(!sync_dims(node)) {
+    if(!scyte_slice_sync_dims(node)) {
         free_op_node(node);
         return NULL;
     }

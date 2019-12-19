@@ -28,7 +28,7 @@ static inline void set_node_idx(scyte_node* node, int node_idx)
     node->params_size = sizeof(int);
 }
 
-static inline int sync_dims(scyte_node* node)
+int scyte_select_sync_dims(scyte_node* node)
 {
     int node_idx = get_node_idx(node);
     scyte_node* chosen_node = node->children[node_idx];
@@ -51,7 +51,7 @@ scyte_node* scyte_select(int node_idx, int n, scyte_node** nodes)
     scyte_node* node = make_opn_node(SELECT, n, nodes);
     set_node_idx(node, node_idx);
     node->forward = scyte_select_forward, node->backward = scyte_select_backward;
-    if(!sync_dims(node)) {
+    if(!scyte_select_sync_dims(node)) {
         free_op_node(node);
         return NULL;
     }

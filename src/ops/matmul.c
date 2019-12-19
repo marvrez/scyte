@@ -13,7 +13,7 @@ static inline void get_rows_cols(scyte_node* node, int* rows, int* cols)
     *cols = scyte_num_elements(node) / *rows;
 }
 
-static inline int sync_dims(scyte_node* node)
+int scyte_matmul_sync_dims(scyte_node* node)
 {
     int num_rows_x, num_cols_x, num_rows_y, num_cols_y;
     get_rows_cols(node->children[0], &num_rows_x, &num_cols_x);
@@ -32,7 +32,7 @@ scyte_node* scyte_matmul(scyte_node* x, scyte_node* y)
 {
     scyte_node* node = make_op2_node(MATMUL, x, y);
     node->forward = scyte_matmul_forward, node->backward = scyte_matmul_backward;
-    if(!sync_dims(node)) {
+    if(!scyte_matmul_sync_dims(node)) {
         free_op_node(node);
         return NULL;
     }

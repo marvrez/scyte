@@ -6,6 +6,8 @@
 // multi-class cross-entropy; pred is the prediction and truth is the truth
 scyte_node* scyte_categorical_x_entropy(scyte_node* truth, scyte_node* pred);
 
+int scyte_categorical_x_entropy_sync_dims(scyte_node* node);
+
 void scyte_categorical_x_entropy_forward(scyte_node* node);
 void scyte_categorical_x_entropy_backward(scyte_node* node);
 

@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-static inline int sync_dims(scyte_node* node)
+int scyte_dropout_sync_dims(scyte_node* node)
 {
     scyte_copy_shape(node->children[0], node);
     // allocate space to store which elements were kept
@@ -20,7 +20,7 @@ scyte_node* scyte_dropout(scyte_node* x, scyte_node* dropout_rate)
     assert(dropout_rate->num_dims == 0);
     scyte_node* node = make_op2_node(DROPOUT, x, dropout_rate);
     node->forward = scyte_dropout_forward, node->backward = scyte_dropout_backward;
-    if(!sync_dims(node)) {
+    if(!scyte_dropout_sync_dims(node)) {
         free_op_node(node);
         return NULL;
     }

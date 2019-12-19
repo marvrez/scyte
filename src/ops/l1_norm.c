@@ -7,7 +7,7 @@
 #include <math.h>
 #include <stdio.h>
 
-static inline int sync_dims(scyte_node* node)
+int scyte_l1_norm_sync_dims(scyte_node* node)
 {
     int n0 = scyte_num_elements(node->children[0]);
     int n1 = scyte_num_elements(node->children[1]);
@@ -23,7 +23,7 @@ scyte_node* scyte_l1_norm(scyte_node* truth, scyte_node* pred)
 {
     scyte_node* node = make_op2_node(L1_NORM, truth, pred);
     node->forward = scyte_l1_norm_forward, node->backward = scyte_l1_norm_backward;
-    if(!sync_dims(node)) {
+    if(!scyte_l1_norm_sync_dims(node)) {
         free_op_node(node);
         return NULL;
     }

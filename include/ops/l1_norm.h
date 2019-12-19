@@ -5,6 +5,8 @@
 
 scyte_node* scyte_l1_norm(scyte_node* truth, scyte_node* pred);
 
+int scyte_l1_norm_sync_dims(scyte_node* node);
+
 void scyte_l1_norm_forward(scyte_node* node);
 void scyte_l1_norm_backward(scyte_node* node);
 

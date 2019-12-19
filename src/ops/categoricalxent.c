@@ -10,7 +10,7 @@
 
 #define EPS 1e-9f
 
-static inline int sync_dims(scyte_node* node)
+int scyte_categorical_x_entropy_sync_dims(scyte_node* node)
 {
     scyte_node* pred = node->children[0], *truth = node->children[1];
     int n0 = scyte_num_elements(pred), n1 = scyte_num_elements(truth);
@@ -26,7 +26,7 @@ scyte_node* scyte_categorical_x_entropy(scyte_node* truth, scyte_node* pred)
 {
     scyte_node* node = make_op2_node(CATEGORICALXENT, pred, truth);
     node->forward = scyte_categorical_x_entropy_forward, node->backward = scyte_categorical_x_entropy_backward;
-    if(!sync_dims(node)) {
+    if(!scyte_categorical_x_entropy_sync_dims(node)) {
         free_op_node(node);
         return NULL;
     }

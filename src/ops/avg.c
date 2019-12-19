@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-static inline int sync_dims(scyte_node* node)
+int scyte_avg_sync_dims(scyte_node* node)
 {
     int n = scyte_num_elements(node->children[0]);
     for(int i = 1; i < node->num_children; ++i) {
@@ -26,7 +26,7 @@ scyte_node* scyte_avg(int n, scyte_node** nodes)
 {
     scyte_node* node = make_opn_node(AVG, n, nodes);
     node->forward = scyte_avg_forward, node->backward = scyte_avg_backward;
-    if(!sync_dims(node)) {
+    if(!scyte_avg_sync_dims(node)) {
         free_op_node(node);
         return NULL;
     }

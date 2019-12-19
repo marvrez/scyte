@@ -22,7 +22,7 @@ static inline void set_axis(scyte_node* node, int axis)
     node->params_size = sizeof(int);
 }
 
-static inline int sync_dims(scyte_node* node)
+int scyte_reduce_sum_sync_dims(scyte_node* node)
 {
     scyte_node* operand = node->children[0];
     int axis = get_axis(node);
@@ -46,7 +46,7 @@ scyte_node* scyte_reduce_sum(scyte_node* node, int axis)
     out->forward = scyte_reduce_sum_forward, out->backward = scyte_reduce_sum_backward;
     if(axis < 0) axis = node->num_dims + axis;
     set_axis(out, axis);
-    if(!sync_dims(out)) {
+    if(!scyte_reduce_sum_sync_dims(out)) {
         free_op_node(out);
         return NULL;
     }

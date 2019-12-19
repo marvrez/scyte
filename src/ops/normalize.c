@@ -12,7 +12,7 @@
 // TODO: generalize so that same operation can be used for batch norm too
 //       e.g. make `axis` a parameter
 
-static inline int sync_dims(scyte_node* node)
+int scyte_normalize_sync_dims(scyte_node* node)
 {
     scyte_node* operand = node->children[0];
     assert(operand->num_dims > 0);
@@ -26,7 +26,7 @@ scyte_node* scyte_normalize(scyte_node* x)
 {
     scyte_node* node = make_op1_node(NORMALIZE, x);
     node->forward = scyte_normalize_forward, node->backward = scyte_normalize_backward;
-    if(!sync_dims(node)) {
+    if(!scyte_normalize_sync_dims(node)) {
         free_op_node(node);
         return NULL;
     }
