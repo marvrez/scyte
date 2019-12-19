@@ -11,6 +11,15 @@ typedef struct {
     matrix y;
 } scyte_data;
 
+typedef struct {
+    scyte_data* d; // the data structure that will contain the loaded data
+    int num_channels; // num channels for image to load
+    char** paths; // paths to the data
+    char** labels; // labels for the data
+    int start_idx; // what idx to start loading the data from
+    int end_idx; // what idx to stop loading the data at
+} load_args;
+
 void scyte_random_batch(scyte_data d, int batch_size, float* X, float* y);
 scyte_data load_image_classification_data(char* images, char* label_file, int colored);
 
