@@ -17,19 +17,19 @@ static inline int sync_dims(scyte_node* node)
     scyte_node* operand = node->children[0];
     assert(operand->num_dims > 0);
     scyte_copy_shape(operand, node);
+    int batch_size = scyte_num_elements(operand) / operand->shape[operand->num_dims - 1];
+    node->tmp = realloc(node->tmp, batch_size*sizeof(float));
     return 1;
 }
 
 scyte_node* scyte_normalize(scyte_node* x)
 {
-    scyte_node* node = make_op1_node(EXP, x);
+    scyte_node* node = make_op1_node(NORMALIZE, x);
     node->forward = scyte_normalize_forward, node->backward = scyte_normalize_backward;
     if(!sync_dims(node)) {
         free_op_node(node);
         return NULL;
     }
-    int batch_size = scyte_num_elements(x) / x->shape[x->num_dims - 1];
-    x->tmp = realloc(x->tmp, batch_size*sizeof(float));
     return node;
 }
 

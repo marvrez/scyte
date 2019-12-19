@@ -25,9 +25,11 @@ static inline void set_axis(scyte_node* node, int axis)
     node->params_size = sizeof(int);
 }
 
-static inline int sync_dims(scyte_node* node, int axis)
+static inline int sync_dims(scyte_node* node)
 {
     scyte_node* input = node->children[0];
+    int axis;
+    get_axis(node,  &axis);
     for(int i = 1; i < node->num_children; ++i) {
         if(node->children[i]->num_dims != input->num_dims) {
             LOG_ERRORF("child %d and input doesn't have same num_dims (%d != %d)",
@@ -52,7 +54,7 @@ scyte_node* scyte_concat(int axis, int n, scyte_node** x)
     scyte_node* node = make_opn_node(CONCAT, n, x);
     set_axis(node, axis);
     node->forward = scyte_concat_forward, node->backward = scyte_concat_backward;
-    if(!sync_dims(node, axis)) {
+    if(!sync_dims(node)) {
         free_op_node(node);
         return NULL;
     }

@@ -21,11 +21,21 @@ static inline void set_shape(scyte_node* node, int n, int* shape)
         }
     }
     node->params = shape_params;
-    node->params_size = sizeof(int)*n;
+    node->params_size = sizeof(int)*(n+1);
 }
 
-static inline int sync_dims(scyte_node* node, int n, int* shape)
+static inline int* get_shape(scyte_node* node, int* n)
 {
+    int* shape_params = (int*)node->params;
+    *n = shape_params[0];
+    return &shape_params[1];
+}
+
+static inline int sync_dims(scyte_node* node)
+{
+    int n;
+    int* shape = get_shape(node, &n);
+
     scyte_node* input = node->children[0];
     int num_elements_input = scyte_num_elements(input);
     if(shape == NULL || n <= 0) {
@@ -65,7 +75,7 @@ scyte_node* scyte_reshape(scyte_node* x, int n, int* shape)
     scyte_node* node = make_op1_node(RESHAPE, x);
     set_shape(node, n, shape);
     node->forward = scyte_reshape_forward, node->backward = scyte_reshape_backward;
-    if(!sync_dims(node, n, shape)) {
+    if(!sync_dims(node)) {
         free_op_node(node);
         return NULL;
     }

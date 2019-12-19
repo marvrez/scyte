@@ -20,7 +20,7 @@ static inline int get_node_idx(scyte_node* node)
 // must be called after a node has been initalized
 static inline void set_node_idx(scyte_node* node, int node_idx)
 {
-    if (node_idx < 0) node_idx += node->num_children;
+    if(node_idx < 0) node_idx += node->num_children;
     assert(node_idx >= 0 && node_idx < node->num_children);
     int* node_idx_ptr = (int*)calloc(1, sizeof(int));
     *node_idx_ptr = node_idx;

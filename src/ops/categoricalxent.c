@@ -10,10 +10,10 @@
 
 #define EPS 1e-9f
 
-static inline int sync_dims(scyte_node* node, scyte_node* pred, scyte_node* truth)
+static inline int sync_dims(scyte_node* node)
 {
-    int n0 = scyte_num_elements(pred);
-    int n1 = scyte_num_elements(truth);
+    scyte_node* pred = node->children[0], *truth = node->children[1];
+    int n0 = scyte_num_elements(pred), n1 = scyte_num_elements(truth);
     if(n0 != n1 || pred->shape[pred->num_dims - 1] != truth->shape[truth->num_dims - 1]) {
         LOG_ERRORF("dimensions (%d != %d) were not equal, returning NULL\n", n0, n1);
         return 0;
@@ -26,7 +26,7 @@ scyte_node* scyte_categorical_x_entropy(scyte_node* truth, scyte_node* pred)
 {
     scyte_node* node = make_op2_node(CATEGORICALXENT, pred, truth);
     node->forward = scyte_categorical_x_entropy_forward, node->backward = scyte_categorical_x_entropy_backward;
-    if(!sync_dims(node, pred, truth)) {
+    if(!sync_dims(node)) {
         free_op_node(node);
         return NULL;
     }
