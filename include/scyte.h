@@ -54,6 +54,8 @@ typedef enum {
     SLICE,
     NORMALIZE,
     NOP,
+    MAXPOOL2D,
+    CONV2D,
 } scyte_op_type;
 
 typedef struct scyte_node {

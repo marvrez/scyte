@@ -78,6 +78,8 @@ char* scyte_get_op_string(scyte_op_type op_type)
         case CATEGORICALXENT: return "categoricalxent";
         case LOGXENT: return "logxent";
         case L1_NORM: return "l1_norm";
+        case MAXPOOL2D: return "maxpool2d";
+        case CONV2D: return "conv2d";
         case NOP: default: break;
     }
     return "unknown";
@@ -112,6 +114,8 @@ scyte_op_type scyte_get_op_type(char* s)
     if(strcmp(s, "categoricalxent")) return CATEGORICALXENT;
     if(strcmp(s, "logxent")) return LOGXENT;
     if(strcmp(s, "l1_norm")) return L1_NORM;
+    if(strcmp(s, "maxpool2d")) return MAXPOOL2D;
+    if(strcmp(s, "conv2d")) return CONV2D;
     LOG_ERRORF("couldn't find operation %s", s);
     return NOP;
 }
@@ -146,6 +150,8 @@ void (*scyte_get_forward_function(scyte_op_type op_type)) (struct scyte_node*)
         case CATEGORICALXENT: return scyte_categorical_x_entropy_forward;
         case LOGXENT: return scyte_logistic_x_entropy_forward;
         case L1_NORM: return scyte_l1_norm_forward;
+        case MAXPOOL2D: return scyte_maxpool2d_forward;
+        case CONV2D: return scyte_conv2d_forward;
         case NOP: default: return NULL;
     }
     return NULL;
@@ -218,6 +224,8 @@ int (*scyte_get_resync_function(scyte_op_type op_type)) (struct scyte_node*)
         case CATEGORICALXENT: return scyte_categorical_x_entropy_sync_dims;
         case LOGXENT: return scyte_logistic_x_entropy_sync_dims;
         case L1_NORM: return scyte_l1_norm_sync_dims;
+        case MAXPOOL2D: return scyte_maxpool2d_sync_dims;
+        case CONV2D: return scyte_conv2d_sync_dims;
         case NOP: default: return NULL;
     }
     return NULL;

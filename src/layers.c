@@ -26,6 +26,15 @@ scyte_node* scyte_layer_input(int n)
     return node;
 }
 
+scyte_node* scyte_layer_input_image(int w, int h, int c)
+{
+    int shape[] = {1, c, h, w};
+    fprintf(stderr, "input                            %4d x %4d x %4d\n", w, h, c);
+    scyte_node* node = scyte_placeholder(4, shape);
+    node->type |= INPUT;
+    return node;
+}
+
 scyte_node* scyte_layer_connected(scyte_node* in, int num_outputs)
 {
     // divide by by batch_size
@@ -91,4 +100,27 @@ scyte_node* scyte_layer_cost(scyte_node* in, int num_out, cost_type type)
     pred->type |= OUTPUT, cost->type |= COST, truth->type |= GROUND_TRUTH;
     fprintf(stderr, "cost                             %4d (%s)\n", num_out, get_cost_string(type));
     return cost;
+}
+
+
+scyte_node* scyte_layer_maxpool2d(scyte_node* in, int size, int stride, int padding)
+{
+    scyte_node* out = scyte_maxpool2d(in, size, stride, padding);
+    int c = in->shape[1], h = in->shape[2], w = in->shape[3];
+    int out_c = out->shape[1], out_h = out->shape[2], out_w = out->shape[3];
+    fprintf(stderr, "maxpool2d                        %d x %d / %d  %4d x%4d x%4d   ->  %4d x%4d x%4d\n", size, size, stride, w, h, c, out_w, out_h, out_c);
+    return out;
+}
+
+scyte_node* scyte_layer_conv2d(scyte_node* in, int num_filters, int size, int stride, int padding)
+{
+    int c = in->shape[1], h = in->shape[2], w = in->shape[3];
+    int filter_shape[4] = { num_filters, c, size, size };
+    scyte_node* filter_weight = scyte_var(4, filter_shape, 0.f);
+    scyte_node* out = scyte_conv2d(in, filter_weight, stride, padding);
+
+    int out_c = out->shape[1], out_h = out->shape[2], out_w = out->shape[3];
+    fprintf(stderr, "conv  %5d %2d x%2d / %2d  %4d x%4d x%4d   ->  %4d x%4d x%4d  %5.3f BFLOPs\n", num_filters, size, size, stride, w, h, c, out_w, out_h, out_c, (2.f*num_filters*size*size*c*out_h*out_w)/1e9f);
+
+    return out;
 }

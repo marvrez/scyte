@@ -13,9 +13,12 @@ typedef enum {
 const char* get_cost_string(cost_type type);
 
 scyte_node* scyte_layer_input(int n);
+scyte_node* scyte_layer_input_image(int w, int h, int c); // stored internally in CHW
 scyte_node* scyte_layer_connected(scyte_node* in, int num_outputs);
 scyte_node* scyte_layer_dropout(scyte_node* in, float dropout_rate);
 scyte_node* scyte_layer_layernorm(scyte_node* in);
 scyte_node* scyte_layer_cost(scyte_node* in, int num_out, cost_type type);
+scyte_node* scyte_layer_maxpool2d(scyte_node* in, int size, int stride, int padding);
+scyte_node* scyte_layer_conv2d(scyte_node* in, int num_filters, int size, int stride, int padding);
 
 #endif
