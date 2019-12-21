@@ -48,18 +48,39 @@ void scale_cpu(int n, float alpha, const float* x, float* y)
 }
 
 #else
+
+#ifdef __AVX__
+#include <x86intrin.h>
+#include <ammintrin.h>
+#include <immintrin.h>
+#include <smmintrin.h>
+#endif
+
 static inline void gemm_nn(int M, int N, int K, float alpha,
         const float* A, int lda,
         const float* B, int ldb,
         float* C, int ldc)
 {
+    int j;
     #pragma omp parallel for
     for(int i = 0; i < M; ++i) {
         for(int k = 0; k < K; ++k) {
             float a_part = alpha*A[i*lda+k];
-            for(int j = 0; j < N; ++j) {
+#ifdef __AVX__
+            __m256 a256, b256, c256, out256;
+            a256 = _mm256_set1_ps(a_part);
+            for(j = 0; j < N >> 3 << 3; j += 8) {
+                b256 = _mm256_loadu_ps(&B[k*ldb + j]);
+                c256 = _mm256_loadu_ps(&C[i*ldc + j]);
+                out256 = _mm256_add_ps(_mm256_mul_ps(a256, b256), c256);
+                _mm256_storeu_ps(&C[i*ldc + j], out256);
+            }
+            for(; j < N; ++j) C[i*ldc+j] += a_part*B[k*ldb+j];
+#else
+            for(j = 0; j < N; ++j) {
                 C[i*ldc+j] += a_part*B[k*ldb+j];
             }
+#endif
         }
     }
 }
