@@ -67,13 +67,17 @@ static inline void gemm_nn(int M, int N, int K, float alpha,
         for(int k = 0; k < K; ++k) {
             float a_part = alpha*A[i*lda+k];
 #ifdef __AVX__
-            __m256 a256, b256, c256, out256;
+            __m256 a256, b256, b256_2, c256, c256_2, out256, out256_2;
             a256 = _mm256_set1_ps(a_part);
-            for(j = 0; j < N >> 3 << 3; j += 8) {
+            for(j = 0; j < N >> 4 << 4; j += 16) {
                 b256 = _mm256_loadu_ps(&B[k*ldb + j]);
+                b256_2 = _mm256_loadu_ps(&B[k*ldb + (j+8)]);
                 c256 = _mm256_loadu_ps(&C[i*ldc + j]);
-                out256 = _mm256_add_ps(_mm256_mul_ps(a256, b256), c256);
+                c256_2 = _mm256_loadu_ps(&C[i*ldc + (j+8)]);
+                out256 = _mm256_fmadd_ps(a256, b256, c256);
+                out256_2 = _mm256_fmadd_ps(a256, b256_2, c256_2);
                 _mm256_storeu_ps(&C[i*ldc + j], out256);
+                _mm256_storeu_ps(&C[i*ldc + (j+8)], out256_2);
             }
             for(; j < N; ++j) C[i*ldc+j] += a_part*B[k*ldb+j];
 #else
