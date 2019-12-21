@@ -39,6 +39,7 @@ scyte_node* scyte_maxpool2d(scyte_node* x, int size, int stride, int padding)
         return NULL;
     }
     scyte_node* node = make_op1_node(MAXPOOL2D, x);
+    node->forward = scyte_maxpool2d_forward, node->backward = scyte_maxpool2d_backward;
     set_pool_params(node, size, stride, padding);
     // set-up output shape and save parameters
     if(!scyte_maxpool2d_sync_dims(node)) {

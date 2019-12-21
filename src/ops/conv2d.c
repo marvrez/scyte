@@ -46,6 +46,7 @@ static inline void set_conv_params(scyte_node* node, int stride, int padding)
 scyte_node* scyte_conv2d(scyte_node* x, scyte_node* w, int stride, int padding)
 {
     scyte_node* node = make_op2_node(CONV2D, x, w);
+    node->forward = scyte_conv2d_forward, node->backward = scyte_conv2d_backward;
     // set-up output shape and save parameters
     set_conv_params(node, stride, padding);
     if(!scyte_conv2d_sync_dims(node)) {
