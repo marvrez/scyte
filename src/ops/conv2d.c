@@ -22,11 +22,12 @@ int scyte_conv2d_sync_dims(scyte_node* node)
     int in_h = x->shape[2], in_w = x->shape[3];
 
     node->num_dims = 4;
-    node->shape[0] = w->shape[0]; // num filters
+    node->shape[0] = x->shape[0]; // batch size
     node->shape[1] = w->shape[1]; // channels
     node->shape[2] = (in_h + 2*padding - size) / stride + 1; // height
     node->shape[3] = (in_w + 2*padding - size) / stride + 1; // width
 
+    // buffer to store the results from im2col and col2im
     node->tmp = calloc(node->shape[1]*node->shape[2]*node->shape[3]*size*size,sizeof(float));
     return 1;
 }
