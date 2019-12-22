@@ -40,7 +40,7 @@ scyte_node* scyte_layer_connected(scyte_node* in, int num_outputs)
     // divide by by batch_size
     int num_inputs = in->num_dims >= 2 ? 
         scyte_num_elements(in) / in->shape[0] : scyte_num_elements(in);
-    fprintf(stderr, "connected                        %4d -> %4d\n", num_inputs, num_outputs);
+    fprintf(stderr, "connected                        %4d -> %4d     %5.3g BFLOPS\n", num_inputs, num_outputs, 2.f*num_inputs*num_outputs/1e9f);
     scyte_node* w = scyte_weight(num_outputs, num_inputs);
     scyte_node* b = scyte_bias(num_outputs, 0.0f);
     return scyte_add(scyte_cmatmul(in, w), b);
@@ -120,7 +120,7 @@ scyte_node* scyte_layer_conv2d(scyte_node* in, int num_filters, int size, int st
     scyte_node* out = scyte_conv2d(in, filter_weight, stride, padding);
 
     int out_c = out->shape[1], out_h = out->shape[2], out_w = out->shape[3];
-    fprintf(stderr, "conv  %5d %2d x%2d / %2d  %4d x%4d x%4d   ->  %4d x%4d x%4d  %5.3f BFLOPs\n", num_filters, size, size, stride, w, h, c, out_w, out_h, out_c, (2.f*num_filters*size*size*c*out_h*out_w)/1e9f);
+    fprintf(stderr, "conv  %5d %2d x%2d / %2d  %4d x%4d x%4d   ->  %4d x%4d x%4d  %5.3g BFLOPs\n", num_filters, size, size, stride, w, h, c, out_w, out_h, out_c, (2.f*num_filters*size*size*c*out_h*out_w)/1e9f);
 
     return out;
 }
