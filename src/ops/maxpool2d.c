@@ -55,6 +55,7 @@ void scyte_maxpool2d_forward(scyte_node* node)
     int in_h = node->shape[2], in_w = node->shape[3];
 
     int batch = node->shape[0], c = node->shape[1], h = node->shape[2], w = node->shape[3];
+    if(!node->tmp) node->tmp = (int*)calloc(scyte_num_elements(node), sizeof(int));
     int* indexes = (int*)node->tmp;
     int* pool_params = (int*)node->params;
     int size = pool_params[0], stride = pool_params[1], padding = pool_params[2];
