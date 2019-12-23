@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define MAX_ARGS 255
 typedef unsigned int arg_flag;
@@ -32,10 +33,10 @@ typedef struct {
   void*         arg;
 } arg_option;
 
-struct { int num_opts; arg_option options[MAX_ARGS+1]; } global_options = { 0 };
+static struct { int num_opts; arg_option options[MAX_ARGS+1]; } global_options = { 0 };
 
 #define arg_add_option(SUFFIX, TYPE) \
-    void arg_option_##SUFFIX(TYPE* arg, char short_name, const char* long_name, const char* help, arg_flag flags) \
+    static inline void arg_option_##SUFFIX(TYPE* arg, char short_name, const char* long_name, const char* help, arg_flag flags) \
     { \
         arg_option opt = { short_name, long_name, help, arg_##SUFFIX, flags, 0, arg }; \
         assert(global_options.num_opts < MAX_ARGS); \
@@ -46,7 +47,7 @@ arg_add_option(int, int);
 arg_add_option(float, float);
 arg_add_option(string, const char*);
 
-void arg_option_count(int* count, char short_name, const char* long_name, const char* help)
+static void arg_option_count(int* count, char short_name, const char* long_name, const char* help)
 {
     arg_option_int(count, short_name, long_name, help, ARG_FORBIDDEN);
 }
@@ -94,7 +95,7 @@ static inline void set_arg_val(arg_option* opt, char* val)
     }
 }
 
-void arg_check_errors(const char* argv0)
+static void arg_check_errors(const char* argv0)
 {
     arg_option* options = global_options.options;
     int num_opts = global_options.num_opts;
@@ -132,7 +133,7 @@ void arg_check_errors(const char* argv0)
     }
 }
 
-int arg_parse(char** argv)
+static int arg_parse(char** argv)
 {
     unsigned int operand_count = 1, doubledash = 0, expecting = 0;
     unsigned int opt_idx, i, j;
@@ -225,7 +226,7 @@ int arg_parse(char** argv)
     return operand_count;
 }
 
-void arg_help()
+static void arg_help()
 {
     printf("Options:\n");
     for(int i = 0; i < global_options.num_opts; ++i) {
