@@ -30,10 +30,10 @@ static inline void train_xor(scyte_network* net, int epochs, float lr, float dec
 
 void predict_xor(scyte_network* net)
 {
-    printf("%f %f --> %f\n", 0.f, 0.f, *scyte_predict_network(net, (float[]){ 0, 0 }));
-    printf("%f %f --> %f\n", 0.f, 1.f, *scyte_predict_network(net, (float[]){ 0, 1 }));
-    printf("%f %f --> %f\n", 1.f, 0.f, *scyte_predict_network(net, (float[]){ 1, 0 }));
-    printf("%f %f --> %f\n", 1.f, 1.f, *scyte_predict_network(net, (float[]){ 1, 1 }));
+    LOG_INFOF("%f %f --> %f\n", 0.f, 0.f, *scyte_predict_network(net, (float[]){ 0, 0 }));
+    LOG_INFOF("%f %f --> %f\n", 0.f, 1.f, *scyte_predict_network(net, (float[]){ 0, 1 }));
+    LOG_INFOF("%f %f --> %f\n", 1.f, 0.f, *scyte_predict_network(net, (float[]){ 1, 0 }));
+    LOG_INFOF("%f %f --> %f\n", 1.f, 1.f, *scyte_predict_network(net, (float[]){ 1, 1 }));
 }
 
 int run_model_xor(int argc, char** argv)

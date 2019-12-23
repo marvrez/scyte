@@ -21,7 +21,7 @@ typedef struct {
 } load_args;
 
 void scyte_random_batch(scyte_data d, int batch_size, float* X, float* y);
-scyte_data load_image_classification_data(char* images, char* label_file, int colored);
+scyte_data load_image_classification_data(const char* images, const char* label_file, int colored);
 
 void scyte_free_data(scyte_data* d);
 void scyte_print_data(scyte_data d);

@@ -14,9 +14,11 @@ int get_sign(float val);
 char* get_shape_string(int n, int* shape);
 
 char* fgetl(FILE* fp);
-list* read_lines(char* filename);
+list* read_lines(const char* filename);
 
  // sorts in increasing value
 void qsortf(int n, float* data);
+
+int max_index(const float* a, int n);
 
 #endif

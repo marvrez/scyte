@@ -57,7 +57,7 @@ void* load_classification_data(void* args)
     return NULL;
 }
 
-scyte_data load_image_classification_data(char* images, char* label_file, int colored)
+scyte_data load_image_classification_data(const char* images, const char* label_file, int colored)
 {
     int num_channels = !!colored ? 3 : 1;
     list* image_list = read_lines(images), *label_list = read_lines(label_file);

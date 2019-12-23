@@ -99,7 +99,7 @@ char *fgetl(FILE *fp)
     return line;
 }
 
-list* read_lines(char* filename)
+list* read_lines(const char* filename)
 {
     char* path;
     FILE* file = fopen(filename, "r");
@@ -125,4 +125,15 @@ int qsortf_cmp(const void* a, const void* b)
 void qsortf(int n, float* data)
 {
     qsort(data, n, sizeof(float), qsortf_cmp);
+}
+
+int max_index(const float* a, int n)
+{
+    if(n <= 0) return -1;
+    int max_i = 0;
+    float max = a[0];
+    for(int i = 1; i < n; ++i) {
+        if(a[i] > max) max = a[i], max_i = i;
+    }
+    return max_i;
 }
