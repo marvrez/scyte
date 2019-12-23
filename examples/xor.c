@@ -39,10 +39,11 @@ void predict_xor(scyte_network* net)
 int run_model_xor(int argc, char** argv)
 {
     srand(1337);
-    int epochs=1000, predict=0;
+    int epochs=1000, predict=0, help=0;
     const char* model_path = NULL;
     float lr=1.f, momentum=0.9f, decay=0.0005f;
 
+    arg_option_count(&help, 'h', "help", "show this message");
     arg_option_count(&predict, 'p', "predict", "set to use prediction mode, else training mode by default");
     arg_option_int(&epochs, 'e', "epochs", "number of epochs to train model", ARG_REQUIRED);
     arg_option_float(&lr, 'r', "lr", "learning rate for model", ARG_REQUIRED);
@@ -51,11 +52,15 @@ int run_model_xor(int argc, char** argv)
     arg_option_string(&model_path, 'w', "weights", "input/output path for weights to model", ARG_REQUIRED);
     arg_parse(argv);
 
-    if(!model_path) {
-        if(!model_path) LOG_ERROR("weight path was not specified");
+    if(help) {
         arg_help();
         exit(1);
     }
+    if(!model_path) {
+        LOG_ERROR("weight path was not specified");
+        exit(1);
+    }
+
     scyte_network* model;
     if(predict <= 0) {
         double t1 = time_now();

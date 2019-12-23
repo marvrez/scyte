@@ -51,6 +51,8 @@ void arg_option_count(int* count, char short_name, const char* long_name, const 
     arg_option_int(count, short_name, long_name, help, ARG_FORBIDDEN);
 }
 
+#undef arg_add_option
+
 static inline unsigned int get_short_option_index(char c)
 {
     unsigned int i;
