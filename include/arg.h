@@ -136,7 +136,7 @@ static void arg_check_errors(const char* argv0)
 static int arg_parse(char** argv)
 {
     unsigned int operand_count = 1, doubledash = 0, expecting = 0;
-    unsigned int opt_idx, i, j;
+    unsigned int opt_idx = 0, i, j;
     arg_option* options = global_options.options;
     for(i = 1; argv[i]; ++i) {
         if(doubledash) {
