@@ -40,7 +40,6 @@ int run_model_xor(int argc, char** argv)
 {
     srand(1337);
     int epochs=1000, predict=0, help=0;
-    const char* model_path = NULL;
     float lr=1.f, momentum=0.9f, decay=0.0005f;
 
     arg_option_count(&help, 'h', "help", "show this message");
@@ -49,18 +48,19 @@ int run_model_xor(int argc, char** argv)
     arg_option_float(&lr, 'r', "lr", "learning rate for model", ARG_REQUIRED);
     arg_option_float(&momentum, 'm', "momentum", "momentum", ARG_REQUIRED);
     arg_option_float(&decay, 'd', "decay", "l2 decay", ARG_REQUIRED);
-    arg_option_string(&model_path, 'w', "weights", "input/output path for weights to model", ARG_REQUIRED);
-    arg_parse(argv);
+    argc = arg_parse(argv);
 
     if(help) {
         arg_help();
         exit(1);
     }
-    if(!model_path) {
-        LOG_ERROR("weight path was not specified");
+    if(argc < 3) {
+        fprintf(stderr, "Usage: %s %s <model_weight_name> [options]\n", argv[0], argv[1]);
+        arg_help();
         exit(1);
     }
 
+    const char* model_path = argv[2];
     scyte_network* model;
     if(predict <= 0) {
         double t1 = time_now();
