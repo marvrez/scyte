@@ -1,7 +1,7 @@
 OPENBLAS ?= 0
 OPENCV ?= 0
 OPENMP ?= 0
-DEBUG  ?= 1
+DEBUG  ?= 0
 AVX ?= 0
 
 OBJ= main.o blas.o utils.o scyte.o op.o list.o layers.o network.o optimizer.o image.o data.o
