@@ -1,12 +1,12 @@
 OPENBLAS ?= 0
 OPENCV ?= 0
 OPENMP ?= 0
-DEBUG  ?= 0
+DEBUG  ?= 1
 AVX ?= 0
 
 OBJ= main.o blas.o utils.o scyte.o op.o list.o layers.o network.o optimizer.o image.o data.o
 OBJ+= add.o sub.o square.o exp.o log.o relu.o sigmoid.o tanh.o softmax.o dropout.o sin.o mul.o mse.o matmul.o cmatmul.o max.o avg.o select.o reduce_sum.o reduce_mean.o slice.o concat.o reshape.o logxent.o categoricalxent.o normalize.o l1_norm.o conv2d.o maxpool2d.o
-EXECOBJA= 
+EXECOBJA= xor.o
 
 VPATH=./src/:./examples:./src/ops
 EXEC=scyte
@@ -45,12 +45,13 @@ LDFLAGS+= `pkg-config --libs opencv`
 COMMON+= `pkg-config --cflags opencv`
 endif
 
+EXECOBJS = $(addprefix $(OBJDIR), $(EXECOBJA))
 OBJS   = $(addprefix $(OBJDIR), $(OBJ))
 DEPS   = $(wildcard include/*.h) Makefile
 
 all: obj $(EXEC)
 
-$(EXEC): $(OBJS)
+$(EXEC): $(OBJS) $(EXECOBJS)
 	$(CC) $(COMMON) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 $(OBJDIR)%.o: %.c $(DEPS)
