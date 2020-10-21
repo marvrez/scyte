@@ -57,13 +57,16 @@ void scyte_rmsprop_step(scyte_optimizer_params params, int n, const float* g, fl
     }
 }
 
-void scyte_adam_step(scyte_optimizer_params params, int n, const float* g, float* g_var, float* g_mean, float* w)
+void scyte_adam_step(scyte_optimizer_params params, int n, const float* g, float* g_var, float* g_mean, float* w, int t)
 {
     assert(params.type == ADAM);
     float lr = params.lr, beta1 = params.beta1, beta2 = params.beta2, decay = params.decay;
     for(int i = 0; i < n; ++i) {
         g_mean[i] = beta1*g_mean[i] + (1.f - beta1)*g[i]; // estimate mean of gradient
         g_var[i] = beta2*g_var[i] + (1.f - beta2)*g[i]*g[i]; // estimate variance of gradients
-        w[i] -= lr*(g_mean[i]/sqrtf(g_var[i] + EPS) + decay*w[i]);
+        // bias correction of raw moments
+        float mhat = g_mean[i] / (1.f - powf(beta1, t));
+        float vhat = g_var[i] / (1.f - powf(beta2, t));
+        w[i] -= lr*(mhat/sqrtf(vhat + EPS) + decay*w[i]);
     }
 }

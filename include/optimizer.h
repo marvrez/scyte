@@ -22,6 +22,6 @@ scyte_optimizer_params scyte_sgd_params(float lr, float decay, float momentum);
 
 void scyte_sgd_step(scyte_optimizer_params params, int n, const float* g, float* g_prev, float* w);
 void scyte_rmsprop_step(scyte_optimizer_params params, int n, const float* g, float* g_var, float* w);
-void scyte_adam_step(scyte_optimizer_params params, int n, const float* g, float* g_var, float* g_mean, float* w);
+void scyte_adam_step(scyte_optimizer_params params, int n, const float* g, float* g_var, float* g_mean, float* w, int t);
 
 #endif

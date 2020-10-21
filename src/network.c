@@ -133,9 +133,9 @@ static inline float scyte_calculate_cost(scyte_network* net, int calc_grads)
     return cost;
 }
 
-static inline void optimizer_step(scyte_optimizer_params params, scyte_network* net, int n, float* g_prev, float* g_mean, float* g_var)
+static inline void optimizer_step(scyte_optimizer_params params, scyte_network* net, int n, float* g_prev, float* g_mean, float* g_var, int t)
 {
-    if(params.type == ADAM) scyte_adam_step(params, n, net->deltas, g_var, g_mean, net->vals);
+    if(params.type == ADAM) scyte_adam_step(params, n, net->deltas, g_var, g_mean, net->vals, t);
     else if(params.type == RMSPROP) scyte_rmsprop_step(params, n, net->deltas, g_var, net->vals);
     else if(params.type == SGD) scyte_sgd_step(params, n, net->deltas, g_prev, net->vals);
 }
@@ -162,7 +162,7 @@ void scyte_train_network(scyte_network* net, scyte_optimizer_params params, int 
     scyte_feed_net(net, INPUT, &X); // input node will be binded to input array
     scyte_feed_net(net, GROUND_TRUTH, &y); // ground truth node will be binded to target array
 
-    int num_val = n*val_split, num_train = n - num_val, keep_best = 0, no_improvement_count = 0;
+    int num_val = n*val_split, num_train = n - num_val, keep_best = 0, no_improvement_count = 0, t = 0;
     float best_val_cost = FLT_MAX;
     for(int i = 0; i < num_epochs; ++i) {
         double t1 = time_now();
@@ -175,7 +175,7 @@ void scyte_train_network(scyte_network* net, scyte_optimizer_params params, int 
             scyte_random_batch(data, bs, X, y);
             scyte_set_batch_size(net->n, net->nodes, bs);
             train_cost += bs*scyte_calculate_cost(net, 1);
-            optimizer_step(params, net, num_vars, g_prev, g_mean, g_var);
+            optimizer_step(params, net, num_vars, g_prev, g_mean, g_var, ++t);
             num_processed += bs;
         }
         train_cost /= num_train;
